@@ -9,6 +9,8 @@ Tema WordPress moderno para intranet corporativa, focado em usabilidade, integra
 - Seção de destaques com integração ao WhatsApp
 - Atalhos rápidos para Helpdesk, Artes, Diretório, Notícias, Folha de Pagamento, Eventos e Relatórios
 - Listagem de notícias e eventos com paginação
+- Previsão do tempo integrada (Open-Meteo API)
+- Controle de acesso (Redirecionamento para login se não autenticado)
 - Estatísticas e métricas importantes
 - Integração com calendário e eventos via shortcode
 - Feed de redes sociais (Instagram)
@@ -18,6 +20,7 @@ Tema WordPress moderno para intranet corporativa, focado em usabilidade, integra
 - Suporte a WebP
 - SEO básico (title-tag)
 - Lazy loading para imagens
+- Tempo de leitura estimado nos posts
 
 ## Estrutura de Pastas
 
@@ -65,80 +68,22 @@ wp-content/themes/intranet/
 
 ## Suporte a Plugins
 
-- Compatível com plugins de calendário e eventos via shortcode.
+- Compatível com plugins de calendário e eventos.
 - Suporte a widgets padrão do WordPress.
+
+## Shortcodes Personalizados
+
+*   `[temperatura]`: Exibe a previsão do tempo atual e para os próximos dias (configurado para Três Corações, MG).
+
+## Controle de Acesso
+
+*   **Bloqueio de Visitantes:** Usuários não logados são redirecionados automaticamente para a tela de login.
+*   **Restrição de Painel:** Usuários sem permissão de administrador não têm acesso ao painel do WordPress e são redirecionados para a home após o login.
+*   **Barra de Admin:** O logo do WordPress é removido da barra de administração.
 
 ## Plugins de terceiros
 
 *   Login Designer (https://br.wordpress.org/plugins/login-designer/)
-
-## Integração com Active Directory (AD/LDAP)
-
-Este tema inclui funcionalidades customizadas para autenticação e sincronização de usuários com o Active Directory (AD) via LDAP.
-
-### 1. Configuração do Ambiente Docker
-
-Para que a integração com o AD funcione, a extensão `php-ldap` precisa estar instalada no container do WordPress.
-
-*   **Crie um `Dockerfile`** na mesma pasta do seu `docker-compose.yml` com o seguinte conteúdo:
-
-    ```dockerfile
-    FROM wordpress:latest
-    RUN apt-get update && apt-get install -y libldap2-dev \
-        && docker-php-ext-install ldap \
-        && rm -rf /var/lib/apt/lists/*
-    ```
-
-*   **Modifique seu `docker-compose.yml`** para usar este `Dockerfile` para o serviço `wordpress_app`:
-
-    ```yaml
-    # ... (outros serviços)
-    wordpress_app:
-      depends_on:
-        - wordpress_db
-      build: . # Altere 'image: wordpress:latest' para 'build: .'
-      container_name: wordpress_app
-      # ... (outras configurações)
-    ```
-
-*   **Reconstrua e suba os containers:**
-
-    ```bash
-    docker-compose up --build -d
-    ```
-
-### 2. Configuração das Credenciais do AD no `wp-config.php`
-
-Para a conexão com o AD, é utilizada uma conta de serviço com permissões de leitura. **Não use uma conta de administrador.**
-
-Adicione as seguintes linhas ao seu `y/data/wordpress/wp-config.php` (antes de `/* That's all, stop editing! Happy publishing. */`), substituindo pelos seus dados reais:
-
-```php
-/**
- * Configurações de Autenticação do Active Directory (LDAP)
- * Credenciais da conta de serviço usada para ler o AD.
- */
-define('AD_SERVICE_USER_DN', 'intranet.pmtc@PMTCAD.LOCAL.BR'); // UPN ou DN completo da conta de serviço
-define('AD_SERVICE_USER_PASS', 'SenhaRealDaContaDeServico'); // Senha da conta de serviço
-```
-
-### 3. Funcionalidades no `functions.php`
-
-O arquivo `y/data/wordpress/wp-content/themes/intranet/functions.php` contém o código para:
-
-*   **Autenticação de Usuários:** Permite que usuários do AD façam login no WordPress usando suas credenciais do AD. Se o usuário não existir no WordPress, ele será criado automaticamente com a função de "Assinante".
-*   **Sincronização de Usuários:** Uma ferramenta no painel administrativo para importar e atualizar usuários do AD em massa.
-
-### 4. Utilizando a Ferramenta de Sincronização
-
-Após configurar o Docker e o `wp-config.php`:
-
-1.  Acesse o painel administrativo do WordPress.
-2.  Vá para **Ferramentas > Sincronizar Usuários AD**.
-3.  Clique no botão "Iniciar Sincronização de Usuários" para importar ou atualizar os usuários do seu Active Directory no WordPress.
-
-**Importante:** A conta de serviço (`AD_SERVICE_USER_DN`) deve ter apenas as permissões mínimas necessárias para ler o diretório.
-
 
 ## Créditos
 
@@ -146,10 +91,3 @@ Desenvolvido por Marco Antonio Vivas
 https://marcovivas.com/
 
 ---
-
-## CODIGO PARA O LoginÉ possive
-```json
-{"login_designer":{"template":"01","bg_image":"https://intranet.local/wp-content/uploads/2025/09/maria-fumaca.jpg","bg_image_gallery":"bg_09","bg_color":"#ffffff","form_shadow":0,"form_shadow_opacity":0,"form_side_padding":40,"form_width":0,"field_bg":"#ffffff","field_border":2,"field_padding_top":6,"field_padding_bottom":6,"field_radius":3,"field_shadow":0,"field_shadow_opacity":0,"logo":"https://intranet.local/wp-content/uploads/2025/09/logo_tc.png","logo_width":160,"logo_height":160},"settings":{"login_designer_page":7,"branding_color":"#000000","branding_icon_color":"#000000"},"language_translator":{"translation":false}}
-```
-
-Para dúvidas ou sugestões, utilize o painel de administração do WordPress ou entre em contato com o desenvolvedor.
