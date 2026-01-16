@@ -212,6 +212,11 @@ body {
   cursor: pointer;
 }
 
+/* Botão Menu Mobile (Oculto no Desktop) */
+.menu-toggle {
+  display: none;
+}
+
 /*--------------------------------------------------------------
 # Sidebar Moderno
 --------------------------------------------------------------*/
@@ -718,15 +723,73 @@ body {
 --------------------------------------------------------------*/
 @media (max-width: 768px) {
   .header-container {
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  .nav-principal ul {
     flex-wrap: wrap;
-    justify-content: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    gap: 0;
   }
   
+  /* Logo Menor no Mobile */
+  .logo-container {
+    width: auto;
+    height: auto;
+    max-width: 70%;
+  }
+  
+  .logo-container img {
+    height: 35px; /* Reduzido para mobile */
+    width: auto;
+  }
+
+  /* Esconder Avatar no Mobile */
+  .user-menu {
+    display: none !important;
+  }
+
+  /* Botão Menu Visível */
+  .menu-toggle {
+    display: block;
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--azul-principal);
+    cursor: pointer;
+    padding: 5px;
+    order: 2;
+  }
+
+  /* Menu Principal Mobile */
+  .nav-principal {
+    display: none;
+    width: 100%;
+    order: 3;
+    margin-top: 15px;
+    background: var(--branco);
+    border-top: 1px solid var(--cinza);
+  }
+
+  .nav-principal.toggled {
+    display: block;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .nav-principal ul {
+    flex-direction: column;
+    width: 100%;
+    padding: 0;
+  }
+  
+  .nav-principal li {
+    width: 100%;
+    border-bottom: 1px solid var(--cinza);
+  }
+
+  .nav-principal a {
+    padding: 15px;
+    width: 100%;
+    justify-content: flex-start;
+  }
+
   .hero-moderno h2 {
     font-size: 2rem;
   }

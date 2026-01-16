@@ -35,6 +35,21 @@
     </div>
   </footer>
   
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navPrincipal = document.querySelector('.nav-principal');
+    
+    if (menuToggle && navPrincipal) {
+      menuToggle.addEventListener('click', function() {
+        navPrincipal.classList.toggle('toggled');
+        const isExpanded = navPrincipal.classList.contains('toggled');
+        menuToggle.setAttribute('aria-expanded', isExpanded);
+      });
+    }
+  });
+  </script>
+
   <?php wp_footer(); ?>
 </body>
 </html>
