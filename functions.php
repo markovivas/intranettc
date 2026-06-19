@@ -780,4 +780,169 @@ function intranet_login_side_image() {
 }
 add_action('login_head', 'intranet_login_side_image');
 
+/*
+ * ===================================================================
+ * Personalização da Página de Perfil do Admin
+ * ===================================================================
+ */
+
+// Conceder permissão de upload para Subscribers
+function intranet_allow_subscriber_uploads() {
+    $subscriber = get_role('subscriber');
+    if ($subscriber && !$subscriber->has_cap('upload_files')) {
+        $subscriber->add_cap('upload_files');
+    }
+}
+add_action('init', 'intranet_allow_subscriber_uploads');
+
+// Permitir upload de mídia via AJAX para todos os logados
+function intranet_allow_upload_for_profile($response, $handler, $action) {
+    if ($action === 'upload-attachment') {
+        if (!current_user_can('upload_files')) {
+            $user = wp_get_current_user();
+            if ($user->exists()) {
+                $user->add_cap('upload_files');
+            }
+        }
+    }
+    return $response;
+}
+add_filter('wp_prepare_attachment_for_js', 'intranet_allow_upload_for_profile', 10, 3);
+
+// Carregar CSS na página de perfil (somente para não-admins)
+function intranet_admin_profile_styles($hook) {
+    if ($hook !== 'profile.php' && $hook !== 'user-edit.php') return;
+    if (current_user_can('administrator')) return;
+    wp_enqueue_style('intranet-admin-profile', get_template_directory_uri() . '/assets/css/admin-profile.css', array(), '1.0.0');
+    wp_enqueue_media();
+}
+add_action('admin_enqueue_scripts', 'intranet_admin_profile_styles');
+
+// Botão "Voltar para o Início" (somente para não-admins)
+function intranet_profile_back_button() {
+    $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+    if (!$screen || $screen->id !== 'profile') return;
+    if (current_user_can('administrator')) return;
+    echo '<div class="intranet-back-home-wrap"><a href="' . esc_url(home_url()) . '" class="button intranet-back-home-btn"><i class="dashicons dashicons-admin-home"></i> Voltar para o Início</a></div>';
+}
+add_action('admin_notices', 'intranet_profile_back_button');
+
+// Adicionar campo de foto do perfil (somente para não-admins)
+function intranet_profile_picture_field($user) {
+    if (current_user_can('administrator')) return;
+    $avatar_url = get_user_meta($user->ID, 'intranet_profile_photo', true);
+    if (empty($avatar_url)) {
+        $avatar_url = get_avatar_url($user->ID, array('size' => 200));
+    }
+    ?>
+    <tr class="user-profile-picture-section-wrap">
+        <th><label><?php _e('Foto do Perfil', 'intranet'); ?></label></th>
+        <td>
+            <div class="user-profile-picture-section">
+                <div class="avatar-wrapper">
+                    <img id="intranet-avatar-preview" src="<?php echo esc_url($avatar_url); ?>" alt="Avatar">
+                </div>
+                <div class="profile-picture-info">
+                    <h3><?php echo esc_html($user->display_name); ?></h3>
+                    <p><?php _e('Envie uma foto do seu computador para personalizar seu perfil.', 'intranet'); ?></p>
+                    <div class="profile-picture-actions">
+                        <button type="button" class="button" id="intranet-upload-avatar">
+                            <i class="dashicons dashicons-upload"></i>
+                            <?php _e('Enviar foto', 'intranet'); ?>
+                        </button>
+                        <button type="button" class="button button-secondary" id="intranet-remove-avatar">
+                            <i class="dashicons dashicons-trash"></i>
+                            <?php _e('Remover', 'intranet'); ?>
+                        </button>
+                    </div>
+                    <input type="hidden" name="intranet_profile_photo" id="intranet-profile-photo" value="<?php echo esc_attr($avatar_url); ?>">
+                    <p class="avatar-change-tip"><?php _e('Formatos aceitos: JPG, PNG, GIF. Tamanho recomendado: 300x300px.', 'intranet'); ?></p>
+                </div>
+            </div>
+        </td>
+    </tr>
+    <?php
+}
+add_action('show_user_profile', 'intranet_profile_picture_field');
+add_action('edit_user_profile', 'intranet_profile_picture_field');
+
+// Salvar foto do perfil
+function intranet_save_profile_picture($user_id) {
+    if (!isset($_POST['intranet_profile_nonce']) || !wp_verify_nonce($_POST['intranet_profile_nonce'], 'intranet_save_profile')) return;
+    if (isset($_POST['intranet_profile_photo'])) {
+        $photo_url = esc_url_raw($_POST['intranet_profile_photo']);
+        update_user_meta($user_id, 'intranet_profile_photo', $photo_url);
+    }
+}
+add_action('profile_update', 'intranet_save_profile_picture');
+
+// Adicionar nonce de segurança (somente para não-admins)
+function intranet_profile_nonce_field($user) {
+    if (current_user_can('administrator')) return;
+    wp_nonce_field('intranet_save_profile', 'intranet_profile_nonce');
+}
+add_action('show_user_profile', 'intranet_profile_nonce_field');
+add_action('edit_user_profile', 'intranet_profile_nonce_field');
+
+// Usar foto personalizada no avatar (substitui Gravatar)
+function intranet_custom_avatar($avatar, $id_or_email, $args) {
+    $user_id = 0;
+    if (is_numeric($id_or_email)) {
+        $user_id = (int) $id_or_email;
+    } elseif (is_string($id_or_email)) {
+        $user = get_user_by('email', $id_or_email);
+        if ($user) $user_id = $user->ID;
+    } elseif (is_object($id_or_email)) {
+        $user_id = (int) $id_or_email->user_id;
+    }
+    if ($user_id > 0) {
+        $custom_photo = get_user_meta($user_id, 'intranet_profile_photo', true);
+        if (!empty($custom_photo)) {
+            $size = isset($args['size']) ? $args['size'] : 96;
+            $class = isset($args['class']) ? $args['class'] : 'avatar avatar-' . $size . ' photo';
+            $avatar = '<img alt="" src="' . esc_url($custom_photo) . '" class="' . esc_attr($class) . '" height="' . esc_attr($size) . '" width="' . esc_attr($size) . '" loading="lazy">';
+        }
+    }
+    return $avatar;
+}
+add_filter('get_avatar', 'intranet_custom_avatar', 10, 3);
+
+// Injetar JavaScript para upload de avatar no perfil (somente para não-admins)
+function intranet_profile_upload_script() {
+    $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+    if (!$screen || $screen->id !== 'profile') return;
+    if (current_user_can('administrator')) return;
+    ?>
+    <script>
+    jQuery(document).ready(function($) {
+        var frame;
+        $('#intranet-upload-avatar').on('click', function(e) {
+            e.preventDefault();
+            if (frame) { frame.open(); return; }
+            frame = wp.media({
+                title: 'Selecionar Foto do Perfil',
+                button: { text: 'Usar esta foto' },
+                multiple: false,
+                library: { type: 'image' }
+            });
+            frame.on('select', function() {
+                var attachment = frame.state().get('selection').first().toJSON();
+                var url = attachment.sizes && attachment.sizes.medium ? attachment.sizes.medium.url : attachment.url;
+                $('#intranet-avatar-preview').attr('src', url);
+                $('#intranet-profile-photo').val(attachment.url);
+            });
+            frame.open();
+        });
+        $('#intranet-remove-avatar').on('click', function(e) {
+            e.preventDefault();
+            var defaultUrl = '<?php echo esc_js(get_avatar_url(0, array("size" => 200))); ?>';
+            $('#intranet-avatar-preview').attr('src', defaultUrl);
+            $('#intranet-profile-photo').val('');
+        });
+    });
+    </script>
+    <?php
+}
+add_action('admin_footer', 'intranet_profile_upload_script');
+
 ?>

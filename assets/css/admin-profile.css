@@ -1,0 +1,658 @@
+/*
+ * Personalização da Página de Perfil do WordPress
+ * Tema: Intranet Corporativa Moderna
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ============================================
+   BASE - SOMENTE CONTEÚDO
+   ============================================ */
+
+/* Fundo do body */
+.profile-php {
+    background: #f0f2f5 !important;
+}
+
+/* Ocultar barra lateral do admin */
+.profile-php #adminmenuback,
+.profile-php #adminmenuwrap,
+.profile-php #adminmenu,
+.profile-php #adminmenufake {
+    display: none !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    overflow: hidden;
+}
+
+/* Ocultar barra admin do topo */
+.profile-php #wpadminbar {
+    display: none !important;
+}
+
+/* Ajustar wpcontent para largura total */
+.profile-php #wpcontent {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    background: #f0f2f5;
+    min-height: 100vh;
+}
+
+.profile-php #wpbody-content {
+    background: #f0f2f5;
+    min-height: 100vh;
+    padding-bottom: 40px;
+}
+
+/* Remover padding do admin bar no body */
+.profile-php.auto-fold #wpcontent,
+.profile-php #adminmenuback ~ #wpcontent {
+    margin-left: 0 !important;
+}
+
+.profile-php .wrap {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 0 20px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.profile-php h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 8px;
+}
+
+/* ============================================
+   BOTÃO VOLTAR PARA INÍCIO
+   ============================================ */
+.intranet-back-home-wrap {
+    max-width: 900px;
+    margin: 20px auto 0;
+    padding: 0 20px;
+}
+
+.intranet-back-home-btn {
+    background: #fff !important;
+    color: #555 !important;
+    border: 1px solid #e0e0e0 !important;
+    border-radius: 10px !important;
+    padding: 10px 20px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    cursor: pointer !important;
+}
+
+.intranet-back-home-btn:hover {
+    background: #f8f9fa !important;
+    border-color: #d0d0d0 !important;
+    color: #333 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+    text-decoration: none !important;
+}
+
+.intranet-back-home-btn .dashicons {
+    font-size: 16px !important;
+    width: 16px !important;
+    height: 16px !important;
+    line-height: 16px !important;
+}
+
+/* ============================================
+   MENSAGEM DE SUCESSO
+   ============================================ */
+.profile-php .updated {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-left: 4px solid #22c55e;
+    color: #166534;
+    padding: 14px 18px;
+    border-radius: 0 10px 10px 0;
+    margin: 20px 0;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.08);
+}
+
+/* ============================================
+   CARD DO PERFIL
+   ============================================ */
+.profile-php #your-profile > h2 {
+    display: none;
+}
+
+/* ============================================
+   OCULTAR CAMPOS DESNECESSÁRIOS
+   ============================================ */
+
+/* Screen Meta Links (Screen Options / Help) */
+.profile-php #screen-meta-links,
+
+/* Username */
+.profile-php #user_login,
+.profile-php #user_login-field,
+
+/* Nickname */
+.profile-php #nickname,
+.profile-php #nickname-field,
+
+/* Display Name */
+.profile-php #display_name,
+.profile-php #display_name-field,
+
+/* Website */
+.profile-php #url,
+.profile-php #url-field,
+
+/* Visual Editor */
+.profile-php .user-rich-editing-wrap,
+
+/* Admin Bar / Toolbar */
+.profile-php .user-admin-bar-front-wrap,
+.profile-php tr.user-admin-bar-front-wrap,
+.profile-php tr.show-admin-bar,
+.profile-php tr.show-admin-bar.user-admin-bar-front-wrap,
+
+/* Color Scheme */
+.profile-php #admin_color_div,
+.profile-php .user-admin-color-scheme-wrap,
+.profile-php tr.user-admin-color-wrap,
+.profile-php #color-picker,
+
+/* Application Passwords */
+.profile-php .user-application-passwords-wrap,
+.profile-php .application-passwords-section,
+.profile-php #application-passwords-section,
+.profile-php .application-passwords,
+
+/* Keyboard Shortcuts */
+.profile-php .user-comment-shortcuts-wrap,
+
+/* Role (se existir) */
+.profile-php #role,
+.profile-php #role-field,
+.profile-php .user-role-setting,
+
+/* Seção de sessões antigas */
+.profile-php .user-sessions-wrap,
+
+/* Avatar padrão do WordPress (user-profile-picture original) */
+.profile-php .user-profile-picture,
+
+/* H2s internos */
+.profile-php #your-profile > h2,
+.profile-php .form-table tr>*:empty {
+
+    display: none !important;
+}
+
+/* Ocultar linhas da tabela que contenham campos indesejados */
+.profile-php .form-table tr:has(#user_login),
+.profile-php .form-table tr:has(#nickname),
+.profile-php .form-table tr:has(#display_name),
+.profile-php .form-table tr:has(#url),
+.profile-php .form-table tr:has(.user-rich-editing-wrap),
+.profile-php .form-table tr:has(.user-admin-bar-front-wrap),
+.profile-php .form-table tr.show-admin-bar,
+.profile-php .form-table tr:has(#admin_color_div),
+.profile-php .form-table tr.user-admin-color-wrap,
+.profile-php .form-table tr:has(.user-application-passwords-wrap),
+.profile-php #application-passwords-section,
+.profile-php .form-table tr:has(.user-comment-shortcuts-wrap),
+.profile-php .form-table tr:has(#role) {
+    display: none !important;
+}
+
+/* ============================================
+   FOOTER DO WORDPRESS
+   ============================================ */
+.profile-php #wpfooter,
+.profile-php .update-nag,
+.profile-php #footer-thankyou,
+.profile-php .community-events-footer {
+    display: none !important;
+}
+
+/* "Thank you for creating with WordPress" */
+.profile-php #wpfooter p,
+.profile-php #footer {
+    display: none !important;
+}
+
+.profile-php table.form-table {
+    background: #fff;
+    border: none;
+    border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.04);
+    margin-bottom: 24px;
+    overflow: hidden;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.profile-php table.form-table th {
+    background: #fafbfc;
+    color: #555;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    width: 200px;
+    vertical-align: middle;
+}
+
+.profile-php table.form-table td {
+    padding: 14px 20px;
+    border-bottom: 1px solid #f5f5f5;
+    vertical-align: middle;
+}
+
+.profile-php table.form-table tr:last-child th,
+.profile-php table.form-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* ============================================
+   CAMPOS DE TEXTO
+   ============================================ */
+.profile-php input[type="text"],
+.profile-php input[type="email"],
+.profile-php input[type="url"],
+.profile-php input[type="password"] {
+    border: 1.5px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #fafafa;
+    transition: all 0.2s ease;
+    width: 100%;
+    max-width: 360px;
+    box-sizing: border-box;
+    color: #333;
+}
+
+.profile-php input[type="text"]:focus,
+.profile-php input[type="email"]:focus,
+.profile-php input[type="url"]:focus,
+.profile-php input[type="password"]:focus {
+    border-color: #2196F3;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+    outline: none;
+}
+
+.profile-php input[type="password"] {
+    max-width: 280px;
+}
+
+.profile-php select {
+    border: 1.5px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-family: 'Inter', -apple-system, BlinkMacFont, sans-serif;
+    background: #fafafa;
+    transition: all 0.2s ease;
+    color: #333;
+    min-width: 200px;
+}
+
+.profile-php select:focus {
+    border-color: #2196F3;
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+    outline: none;
+}
+
+.profile-php textarea {
+    border: 1.5px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 14px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #fafafa;
+    transition: all 0.2s ease;
+    width: 100%;
+    max-width: 460px;
+    box-sizing: border-box;
+    resize: vertical;
+    min-height: 80px;
+    color: #333;
+}
+
+.profile-php textarea:focus {
+    border-color: #2196F3;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+    outline: none;
+}
+
+/* ============================================
+   CHECKBOX / RADIO
+   ============================================ */
+.profile-php input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #2196F3;
+    cursor: pointer;
+    margin-right: 6px;
+}
+
+.profile-php .profile-php label,
+.profile-php label {
+    font-size: 13px;
+    color: #555;
+    font-weight: 500;
+}
+
+/* ============================================
+   SEÇÃO: FOTO DO PERFIL
+   ============================================ */
+
+/* Ocultar somente o rótulo "Foto do Perfil" */
+.profile-php .user-profile-picture-section-wrap th,
+.profile-php .user-profile-picture-section-wrap th label {
+    display: none !important;
+}
+
+.profile-php .user-profile-picture-section-wrap td {
+    padding-left: 0 !important;
+}
+
+.profile-php .user-profile-picture-section {
+    background: #fff;
+    border: none;
+    border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.04);
+    padding: 30px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.profile-php .avatar-wrapper {
+    flex-shrink: 0;
+    position: relative;
+}
+
+.profile-php .avatar-wrapper img {
+    border-radius: 50%;
+    border: 4px solid #f0f2f5;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-php .avatar-wrapper img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.profile-php .profile-picture-info {
+    flex: 1;
+}
+
+.profile-php .profile-picture-info h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin: 0 0 6px 0;
+}
+
+.profile-php .profile-picture-info p {
+    font-size: 13px;
+    color: #888;
+    margin: 0 0 16px 0;
+    line-height: 1.5;
+}
+
+.profile-php .profile-picture-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* ============================================
+   BOTÕES
+   ============================================ */
+.profile-php .button,
+.profile-php input[type="submit"] {
+    background: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: 0.01em;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.profile-php .button:hover,
+.profile-php input[type="submit"]:hover {
+    background: #1976D2;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+    color: white;
+    text-decoration: none;
+}
+
+.profile-php .button:active,
+.profile-php input[type="submit"]:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(33, 150, 243, 0.25);
+}
+
+.profile-php .button-secondary {
+    background: #f5f5f5;
+    color: #555;
+    border: 1px solid #e0e0e0;
+}
+
+.profile-php .button-secondary:hover {
+    background: #eee;
+    color: #333;
+    border-color: #d0d0d0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.profile-php .button-link {
+    background: none;
+    color: #e74c3c;
+    border: none;
+    padding: 10px 0;
+    font-weight: 500;
+    box-shadow: none;
+}
+
+.profile-php .button-link:hover {
+    background: none;
+    color: #c0392b;
+    box-shadow: none;
+    transform: none;
+}
+
+/* ============================================
+   BOTÃO SALVAR
+   ============================================ */
+.profile-php .submit {
+    background: #fff;
+    border: none;
+    border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.04);
+    padding: 20px 30px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.profile-php .submit input[type="submit"] {
+    padding: 12px 32px;
+    font-size: 14px;
+}
+
+/* ============================================
+   SEÇÃO: APLICATIVOS DE PASSWORD
+   ============================================ */
+.profile-php .user-rich-editing-wrap,
+.profile-php .user-comment-shortcuts-wrap,
+.profile-php .user-admin-color-scheme-wrap,
+.profile-php .user-admin-bar-front-wrap {
+    padding: 12px 0;
+}
+
+.profile-php .description {
+    font-size: 12px;
+    color: #999;
+    margin-top: 4px;
+}
+
+/* ============================================
+   SEÇÃO: INFO PESSOAL
+   ============================================ */
+.profile-php .user-name-login-wrap,
+.profile-php .user-email-wrap {
+    padding: 12px 0;
+}
+
+/* ============================================
+   SEÇÃO: CHAVE APLICATIVO
+   ============================================ */
+.profile-php .application-passwords {
+    background: #fafbfc;
+    border: 1px solid #f0f0f0;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 12px;
+}
+
+/* ============================================
+   SEÇÃO: SESSÕES
+   ============================================ */
+.profile-php .user-sessions-wrap {
+    padding: 12px 0;
+}
+
+/* ============================================
+   SEÇÃO: DELETAR CONTA
+   ============================================ */
+.profile-php .delete-account-wrap {
+    background: #fff5f5;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+/* ============================================
+   SEÇÃO: BIO
+   ============================================ */
+.profile-php #description {
+    min-height: 100px;
+}
+
+/* ============================================
+   RESPONSIVO
+   ============================================ */
+@media screen and (max-width: 782px) {
+    .profile-php #wpadminbar {
+        display: none !important;
+    }
+
+    .profile-php #wpcontent {
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+    }
+
+    .profile-php .wrap {
+        margin: 16px auto;
+        padding: 0 12px;
+    }
+
+    .profile-php table.form-table th {
+        width: auto;
+        padding: 12px 16px;
+        display: block;
+    }
+
+    .profile-php table.form-table td {
+        padding: 8px 16px 16px;
+        display: block;
+    }
+
+    .profile-php input[type="text"],
+    .profile-php input[type="email"],
+    .profile-php input[type="url"],
+    .profile-php input[type="password"],
+    .profile-php textarea {
+        max-width: 100%;
+    }
+
+    .profile-php .user-profile-picture-section {
+        flex-direction: column;
+        text-align: center;
+        padding: 24px 20px;
+    }
+
+    .profile-php .profile-picture-actions {
+        justify-content: center;
+    }
+
+    .profile-php .submit {
+        padding: 16px 20px;
+    }
+}
+
+/* ============================================
+   ANIMAÇÃO
+   ============================================ */
+@keyframes fadeInProfile {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.profile-php table.form-table,
+.profile-php .user-profile-picture-section,
+.profile-php .submit {
+    animation: fadeInProfile 0.4s ease-out;
+}
+
+/* ============================================
+   TOOLTIP DO AVATAR
+   ============================================ */
+.profile-php .avatar-change-tip {
+    font-size: 12px;
+    color: #999;
+    margin-top: 8px;
+    font-style: italic;
+}
+
+/* ============================================
+   HEADER DO ADMIN - AVATAR
+   ============================================ */
+#adminmenu .wp-menu-image img {
+    border-radius: 50%;
+}

@@ -35,9 +35,9 @@
       <div class="user-menu">
   <?php if (is_user_logged_in()) : 
     $current_user = wp_get_current_user();
-    echo get_avatar($current_user->ID, 40, '', $current_user->display_name, ['class' => 'user-avatar']);
+    echo get_avatar($current_user->ID, 32, '', $current_user->display_name, ['class' => 'user-avatar', 'force_default' => false]);
   else : ?>
-    <img src="<?php echo get_template_directory_uri(); ?>/assets/images/avatar-default.png" alt="Avatar" class="user-avatar" width="40" height="40">
+    <img src="<?php echo get_template_directory_uri(); ?>/assets/images/avatar-default.png" alt="Avatar" class="user-avatar" width="32" height="32">
   <?php endif; ?>
 </div>
     </div>
