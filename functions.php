@@ -286,14 +286,7 @@ function intranet_previsao_tempo_shortcode() {
             .tempo-atual { border-right: none; border-bottom: 1px solid rgba(255, 255, 255, 0.3); padding-right: 0; padding-bottom: 20px; }
             .tempo-forecast { grid-template-columns: repeat(2, 1fr); }
         }
-        @media (prefers-color-scheme: dark) {
-            .tempo-container {
-                background: linear-gradient(135deg, #2d3436, #1e272e);
-            }
-            .forecast-dia {
-                background: rgba(255, 255, 255, 0.05);
-            }
-        }
+        /* Dark Mode desabilitado */
     </style>
     <section class="previsao-tempo-moderna">
       <div class="section-header"><h3><?php _e('Tempo em Três Corações', 'intranet'); ?></h3></div>
