@@ -484,4 +484,300 @@ function remover_logo_wp_admin_bar($wp_admin_bar) {
 }
 add_action('admin_bar_menu', 'remover_logo_wp_admin_bar', 999);
 
+/*
+ * ===================================================================
+ * Personalização da Tela de Login
+ * ===================================================================
+ */
+
+// Registrar seções e campos no Personalizador do WordPress
+function intranet_customize_register($wp_customize) {
+
+    // === Seção: Tela de Login ===
+    $wp_customize->add_section('intranet_login_section', array(
+        'title'    => 'Tela de Login',
+        'priority' => 30,
+    ));
+
+    // --- Logo ---
+    $wp_customize->add_setting('login_logo', array(
+        'default'           => get_template_directory_uri() . '/assets/images/logo.png',
+        'sanitize_callback' => 'esc_url_raw',
+    ));
+    $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, 'login_logo', array(
+        'label'   => 'Logo da Tela de Login',
+        'section' => 'intranet_login_section',
+    )));
+
+    // --- Imagem Lateral ---
+    $wp_customize->add_setting('login_side_image', array(
+        'default'           => get_template_directory_uri() . '/assets/images/maria-fumaca.jpg',
+        'sanitize_callback' => 'esc_url_raw',
+    ));
+    $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, 'login_side_image', array(
+        'label'   => 'Imagem Lateral (60% da tela)',
+        'section' => 'intranet_login_section',
+    )));
+
+    // --- Rótulo Usuário ---
+    $wp_customize->add_setting('login_label_username', array(
+        'default'           => 'Digite sua matrícula',
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    $wp_customize->add_control('login_label_username', array(
+        'label'   => 'Rótulo do Campo Usuário',
+        'section' => 'intranet_login_section',
+        'type'    => 'text',
+    ));
+
+    // --- Rótulo Senha ---
+    $wp_customize->add_setting('login_label_password', array(
+        'default'           => 'Senha é a data de nascimento (somente números)',
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    $wp_customize->add_control('login_label_password', array(
+        'label'   => 'Rótulo do Campo Senha',
+        'section' => 'intranet_login_section',
+        'type'    => 'text',
+    ));
+
+    // --- Texto da Mensagem ---
+    $wp_customize->add_setting('login_message_text', array(
+        'default'           => 'Você está desconectado agora.',
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    $wp_customize->add_control('login_message_text', array(
+        'label'   => 'Mensagem Acima do Formulário',
+        'section' => 'intranet_login_section',
+        'type'    => 'text',
+    ));
+
+    // --- Texto do Botão ---
+    $wp_customize->add_setting('login_button_text', array(
+        'default'           => 'Acessar',
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    $wp_customize->add_control('login_button_text', array(
+        'label'   => 'Texto do Botão de Envio',
+        'section' => 'intranet_login_section',
+        'type'    => 'text',
+    ));
+
+    // --- Cor do Botão ---
+    $wp_customize->add_setting('login_button_color', array(
+        'default'           => '#2196F3',
+        'sanitize_callback' => 'sanitize_hex_color',
+    ));
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'login_button_color', array(
+        'label'   => 'Cor do Botão',
+        'section' => 'intranet_login_section',
+    )));
+
+    // --- Cor de Fundo do Formulário ---
+    $wp_customize->add_setting('login_form_bg', array(
+        'default'           => '#ffffff',
+        'sanitize_callback' => 'sanitize_hex_color',
+    ));
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'login_form_bg', array(
+        'label'   => 'Cor de Fundo do Formulário',
+        'section' => 'intranet_login_section',
+    )));
+
+    // --- Cor do Texto ---
+    $wp_customize->add_setting('login_text_color', array(
+        'default'           => '#333333',
+        'sanitize_callback' => 'sanitize_hex_color',
+    ));
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'login_text_color', array(
+        'label'   => 'Cor do Texto',
+        'section' => 'intranet_login_section',
+    )));
+
+    // --- Cor de Fundo da Página ---
+    $wp_customize->add_setting('login_page_bg', array(
+        'default'           => '#f0f2f5',
+        'sanitize_callback' => 'sanitize_hex_color',
+    ));
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'login_page_bg', array(
+        'label'   => 'Cor de Fundo da Página',
+        'section' => 'intranet_login_section',
+    )));
+
+    // --- Texto do Link "Perdeu a senha?" ---
+    $wp_customize->add_setting('login_lost_password_text', array(
+        'default'           => 'Perdeu a senha?',
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    $wp_customize->add_control('login_lost_password_text', array(
+        'label'   => 'Texto "Perdeu a senha?"',
+        'section' => 'intranet_login_section',
+        'type'    => 'text',
+    ));
+
+    // --- Texto do Link "Ir para..." ---
+    $wp_customize->add_setting('login_back_text', array(
+        'default'           => '',
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    $wp_customize->add_control('login_back_text', array(
+        'label'       => 'Texto do Link "Voltar" (deixe vazio para ocultar)',
+        'description' => 'Ex: Ir para Intranet PMTC',
+        'section'     => 'intranet_login_section',
+        'type'        => 'text',
+    ));
+
+    // --- Tamanho do Logo ---
+    $wp_customize->add_setting('login_logo_width', array(
+        'default'           => '180',
+        'sanitize_callback' => 'absint',
+    ));
+    $wp_customize->add_control('login_logo_width', array(
+        'label'       => 'Largura do Logo (px)',
+        'description' => 'Largura em pixels. Altura ajustada automaticamente.',
+        'section'     => 'intranet_login_section',
+        'type'        => 'number',
+        'input_attrs' => array('min' => 60, 'max' => 500, 'step' => 10),
+    ));
+}
+add_action('customize_register', 'intranet_customize_register');
+
+// Carregar CSS e scripts customizados na tela de login
+function intranet_login_enqueue_scripts() {
+    wp_enqueue_style('intranet-login-custom', get_template_directory_uri() . '/assets/css/login-custom.css', array(), '1.0.0');
+}
+add_action('login_enqueue_scripts', 'intranet_login_enqueue_scripts');
+
+// Injetar CSS dinâmico baseado nas configurações do Personalizador
+function intranet_login_dynamic_css() {
+    $button_color = get_theme_mod('login_button_color', '#2196F3');
+    $form_bg      = get_theme_mod('login_form_bg', '#ffffff');
+    $text_color   = get_theme_mod('login_text_color', '#333333');
+    $page_bg      = get_theme_mod('login_page_bg', '#f0f2f5');
+
+    // Calcula versão mais escura do botão para o hover
+    $button_hover = esc_attr(sanitize_hex_color(darken_hex($button_color, 15)));
+
+    echo '<style id="intranet-login-dynamic">
+        body.login { background-color: ' . esc_attr($page_bg) . '; }
+        .login-form-panel { background-color: ' . esc_attr($form_bg) . '; }
+        .login-form-panel,
+        .login-form-panel label { color: ' . esc_attr($text_color) . '; }
+        .login-message { color: ' . esc_attr($text_color) . '99; }
+        #loginform input[type="text"],
+        #loginform input[type="password"] {
+            border-color: ' . esc_attr($text_color) . '18;
+            background: ' . esc_attr($form_bg) . 'f5;
+        }
+        #loginform input[type="text"]:focus,
+        #loginform input[type="password"]:focus {
+            border-color: ' . esc_attr($button_color) . ';
+            box-shadow: 0 0 0 3px ' . esc_attr($button_color) . '1a;
+            background: ' . esc_attr($form_bg) . ';
+        }
+        #loginform .submit input[type="submit"] {
+            background-color: ' . esc_attr($button_color) . ';
+        }
+        #loginform .submit input[type="submit"]:hover {
+            background-color: ' . esc_attr($button_hover) . ';
+            box-shadow: 0 4px 16px ' . esc_attr($button_color) . '59;
+        }
+        .login .rememberme label { color: ' . esc_attr($text_color) . '99; }
+        .login .rememberme input[type="checkbox"] { accent-color: ' . esc_attr($button_color) . '; }
+        #nav a { color: ' . esc_attr($text_color) . '88; }
+        #nav a:hover { color: ' . esc_attr($button_color) . '; }
+        #backtoblog a { color: ' . esc_attr($text_color) . '66; }
+        #backtoblog a:hover { color: ' . esc_attr($button_color) . '; }
+    </style>';
+}
+add_action('login_head', 'intranet_login_dynamic_css');
+
+// Função auxiliar para escurecer uma cor hex
+function darken_hex($hex, $percent) {
+    $hex = ltrim($hex, '#');
+    if (strlen($hex) === 3) {
+        $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
+    }
+    $r = max(0, round(hexdec(substr($hex, 0, 2)) * (1 - $percent / 100)));
+    $g = max(0, round(hexdec(substr($hex, 2, 2)) * (1 - $percent / 100)));
+    $b = max(0, round(hexdec(substr($hex, 4, 2)) * (1 - $percent / 100)));
+    return sprintf('#%02x%02x%02x', $r, $g, $b);
+}
+
+// Personalizar o logo da tela de login (com tamanho configurável)
+function intranet_login_logo() {
+    $logo_url = get_theme_mod('login_logo', get_template_directory_uri() . '/assets/images/logo.png');
+    $logo_width = get_theme_mod('login_logo_width', '180');
+    echo '<style>#login h1 a { background-image: url(' . esc_url($logo_url) . ') !important; background-size: contain !important; width: ' . esc_attr($logo_width) . 'px !important; height: auto !important; }</style>';
+}
+add_action('login_head', 'intranet_login_logo');
+
+// Traduzir textos da tela de login via filtro gettext
+function intranet_login_translations($translated, $text, $domain) {
+    if ($domain !== 'default') return $translated;
+
+    // Detecta se está na tela de login
+    $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+    $is_login_page = (isset($_GET['action']) && $_GET['action'] === 'logout')
+        || (isset($_GET['loggedout']) && $_GET['loggedout'] === 'true')
+        || (function_exists('get_current_screen') && $screen && isset($screen->id) && $screen->id === 'login')
+        || (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === 'wp-login.php');
+    if (!$is_login_page) return $translated;
+
+    $label_username = get_theme_mod('login_label_username', '');
+    $label_password = get_theme_mod('login_label_password', '');
+    $button_text    = get_theme_mod('login_button_text', '');
+    $lost_pw_text   = get_theme_mod('login_lost_password_text', '');
+
+    $replacements = array();
+
+    if (!empty($label_username)) {
+        $replacements['Username or Email Address'] = $label_username;
+        $replacements['Username'] = $label_username;
+    }
+    if (!empty($label_password)) {
+        $replacements['Password'] = $label_password;
+    }
+    if (!empty($button_text)) {
+        $replacements['Log In'] = $button_text;
+        $replacements['Log in'] = $button_text;
+    }
+    if (!empty($lost_pw_text)) {
+        $replacements['Lost your password?'] = $lost_pw_text;
+    }
+
+    if (isset($replacements[$text])) {
+        return $replacements[$text];
+    }
+
+    return $translated;
+}
+add_filter('gettext', 'intranet_login_translations', 10, 3);
+
+// Adicionar mensagem personalizada abaixo do logo
+function intranet_login_message() {
+    $message = get_theme_mod('login_message_text', 'Você está desconectado agora.');
+    return '<p class="login-message">' . esc_html($message) . '</p>';
+}
+add_filter('login_message', 'intranet_login_message');
+
+// Adicionar imagem lateral e painel do formulário na tela de login
+function intranet_login_side_image() {
+    $side_image_url = esc_url(get_theme_mod('login_side_image', get_template_directory_uri() . '/assets/images/maria-fumaca.jpg'));
+    $back_text = get_theme_mod('login_back_text', '');
+    $home_url = esc_url(home_url());
+    $script = '<script>document.addEventListener("DOMContentLoaded",function(){'
+        . 'var l=document.getElementById("login");if(!l)return;'
+        . 'var s=document.createElement("div");s.className="login-side-image";s.style.backgroundImage="url(' . $side_image_url . ')";l.appendChild(s);'
+        . 'var p=document.createElement("div");p.className="login-form-panel";'
+        . 'var h=l.querySelector("h1"),n=l.querySelector("#nav"),b=l.querySelector("#backtoblog");'
+        . 'if(h)p.appendChild(h);if(n)n.style.display="none";if(b)b.remove();'
+        . 'var c=l.querySelectorAll("#loginform,.message,#login_error");for(var i=0;i<c.length;i++)p.appendChild(c[i]);'
+        . 'var m=document.querySelector(".login-message");if(m)p.insertBefore(m,p.firstChild);'
+        . 'l.insertBefore(p,l.firstChild);'
+        . (empty($back_text) ? '' : 'var bk=document.createElement("div");bk.id="backtoblog";bk.innerHTML="<a href=\"' . $home_url . '\">&larr; ' . esc_js($back_text) . '</a>";p.appendChild(bk);')
+        . '});</script>';
+    echo $script;
+}
+add_action('login_head', 'intranet_login_side_image');
+
 ?>

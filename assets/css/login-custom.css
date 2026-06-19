@@ -1,0 +1,495 @@
+/*
+ * Personalização da Tela de Login WordPress
+ * Tema: Intranet Corporativa Moderna
+ * Layout: 40% Formulário | 60% Imagem
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ============================================
+   RESET E BASE
+   ============================================ */
+body.login {
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+#login {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+/* ============================================
+   PAINEL DO FORMULÁRIO (40%)
+   ============================================ */
+.login-form-panel {
+    width: 40%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 50px;
+    position: relative;
+    z-index: 2;
+    box-sizing: border-box;
+}
+
+/* Logo */
+.login-form-panel h1 {
+    display: block !important;
+    margin-bottom: 8px;
+    line-height: 1;
+}
+
+.login-form-panel h1 a {
+    display: inline-block;
+    margin-bottom: 0;
+    background-position: center !important;
+}
+
+/* Mensagem */
+.login-message {
+    color: #8c8c8c;
+    font-size: 14px;
+    margin-bottom: 32px;
+    text-align: center;
+    font-weight: 400;
+    max-width: 380px;
+    line-height: 1.5;
+}
+
+/* ============================================
+   FORMULÁRIO
+   ============================================ */
+#loginform {
+    width: 100%;
+    max-width: 380px;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+#loginform label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #666;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+}
+
+#loginform input[type="text"],
+#loginform input[type="password"] {
+    width: 100%;
+    padding: 13px 16px;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #fafafa;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    color: #333;
+}
+
+#loginform input[type="text"]:hover,
+#loginform input[type="password"]:hover {
+    border-color: #d0d0d0;
+    background: #fff;
+}
+
+#loginform input[type="text"]:focus,
+#loginform input[type="password"]:focus {
+    border-color: #2196F3;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+    outline: none;
+}
+
+/* ============================================
+   SENHA - TOGGLE VISIBILIDADE
+   ============================================ */
+#loginform .wp-pwd {
+    position: relative;
+}
+
+#loginform .wp-pwd input {
+    width: 100%;
+    padding-right: 50px;
+}
+
+#loginform .wp-pwd button.wp-pwd-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    color: #999;
+    font-size: 16px;
+    transition: color 0.2s;
+}
+
+#loginform .wp-pwd button.wp-pwd-toggle:hover {
+    color: #333;
+}
+
+/* ============================================
+   CHECKBOX LEMBRAR-ME
+   ============================================ */
+.login .rememberme {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    float: none;
+}
+
+.login .rememberme label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #888;
+    cursor: pointer;
+    user-select: none;
+}
+
+.login .rememberme input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: #2196F3;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+/* ============================================
+   LINHA: LEMBRAR-ME + BOTÃO
+   ============================================ */
+#loginform .forgetmenot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0;
+    width: 100%;
+}
+
+/* ============================================
+   BOTÃO ENVIAR
+   ============================================ */
+#loginform .submit {
+    margin-top: 24px;
+    width: 100%;
+}
+
+#loginform .submit input[type="submit"] {
+    width: 100%;
+    padding: 13px 24px;
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: 0.02em;
+}
+
+#loginform .submit input[type="submit"]:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(33, 150, 243, 0.35);
+}
+
+#loginform .submit input[type="submit"]:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.25);
+}
+
+/* ============================================
+   LINKS INFERIORES
+   ============================================ */
+#nav {
+    text-align: center;
+    margin-top: 20px;
+    width: 100%;
+    max-width: 380px;
+}
+
+#nav a {
+    color: #aaa;
+    text-decoration: none;
+    font-size: 13px;
+    transition: color 0.2s;
+}
+
+#nav a:hover {
+    color: #2196F3;
+}
+
+#backtoblog {
+    text-align: center;
+    margin-top: 12px;
+    width: 100%;
+    max-width: 380px;
+}
+
+#backtoblog a {
+    color: #bbb;
+    text-decoration: none;
+    font-size: 12px;
+    transition: color 0.2s;
+}
+
+#backtoblog a:hover {
+    color: #2196F3;
+}
+
+/* ============================================
+   IMAGEM LATERAL (60%)
+   ============================================ */
+.login-side-image {
+    width: 60%;
+    min-height: 100vh;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    flex-shrink: 0;
+}
+
+
+
+/* ============================================
+   ERROS E MENSAGENS
+   ============================================ */
+#login_error {
+    background: #fff5f5;
+    border-left: 4px solid #e74c3c;
+    color: #c0392b;
+    padding: 14px 18px;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 24px;
+    font-size: 13px;
+    font-weight: 500;
+    max-width: 380px;
+    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.08);
+}
+
+.message {
+    background: #f0fdf4;
+    border-left: 4px solid #27ae60;
+    color: #1e7e34;
+    padding: 14px 18px;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 24px;
+    font-size: 13px;
+    font-weight: 500;
+    max-width: 380px;
+    box-shadow: 0 2px 8px rgba(39, 174, 96, 0.08);
+}
+
+/* ============================================
+   RESPONSIVO - TABLET (≤1024px)
+   ============================================ */
+@media screen and (max-width: 1024px) {
+    .login-form-panel {
+        width: 50%;
+        padding: 50px 40px;
+    }
+
+    .login-side-image {
+        width: 50%;
+    }
+}
+
+/* ============================================
+   RESPONSIVO - TABLET PEQUENO (≤768px)
+   ============================================ */
+@media screen and (max-width: 768px) {
+    #login {
+        flex-direction: column;
+    }
+
+    .login-form-panel {
+        width: 100%;
+        min-height: 60vh;
+        padding: 50px 30px;
+    }
+
+    .login-side-image {
+        width: 100%;
+        min-height: 40vh;
+        order: -1;
+    }
+
+    #loginform {
+        max-width: 420px;
+    }
+
+    #nav, #backtoblog {
+        max-width: 420px;
+    }
+}
+
+/* ============================================
+   RESPONSIVO - MOBILE (≤480px)
+   ============================================ */
+@media screen and (max-width: 480px) {
+    .login-form-panel {
+        padding: 30px 24px;
+        min-height: auto;
+        flex: 1;
+    }
+
+    .login-side-image {
+        min-height: 200px;
+        max-height: 260px;
+    }
+
+    .login-form-panel h1 a {
+        transform: scale(0.85);
+        transform-origin: center;
+    }
+
+    .login-message {
+        font-size: 13px;
+        margin-bottom: 24px;
+    }
+
+    #loginform label {
+        font-size: 12px;
+    }
+
+    #loginform input[type="text"],
+    #loginform input[type="password"] {
+        padding: 12px 14px;
+        font-size: 14px;
+    }
+
+    #loginform .submit input[type="submit"] {
+        padding: 12px 20px;
+        font-size: 14px;
+    }
+
+    #login_error,
+    .message {
+        max-width: 100%;
+        font-size: 12px;
+    }
+}
+
+/* ============================================
+   RESPONSIVO - MOBILE PEQUENO (≤360px)
+   ============================================ */
+@media screen and (max-width: 360px) {
+    .login-form-panel {
+        padding: 24px 16px;
+    }
+
+    .login-side-image {
+        min-height: 160px;
+        max-height: 200px;
+    }
+
+    #loginform {
+        max-width: 100%;
+    }
+
+    #nav, #backtoblog {
+        max-width: 100%;
+    }
+}
+
+/* ============================================
+   ANIMAÇÕES
+   ============================================ */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.login-form-panel {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+.login-side-image {
+    animation: fadeIn 0.6s ease-out;
+}
+
+/* ============================================
+   COMPATIBILIDADE E RESETS
+   ============================================ */
+.login form {
+    position: relative;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.login form .input {
+    font-size: 14px;
+    padding: 13px 16px;
+    border-radius: 10px;
+}
+
+.login #pass-strength-result {
+    border-radius: 10px;
+    border: 1.5px solid #e0e0e0;
+}
+
+/* Ocultar HR padrão do WP */
+.login form .clear {
+    display: none;
+}
+
+/* Ocultar texto "Powered by WordPress" */
+.login #login_error {
+    line-height: 1.5;
+}
+
+/* Ajuste para interidade visível */
+.login-side-image::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, transparent 60%, rgba(0,0,0,0.02));
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Separador sutil entre formulário e imagem */
