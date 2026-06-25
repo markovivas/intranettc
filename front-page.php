@@ -23,10 +23,10 @@
     <section class="hero-moderno">
       <div class="container">
         <div class="hero-content">
-    <h2><?php _e('Bem-vindo à Intranet', 'intranet'); ?></h2>
-    <p><?php _e('Um espaço pensado para você, servidor público de Três Corações, com acesso rápido a informações, documentos e serviços essenciais.', 'intranet'); ?></p>
-    <a href="/intranet" class="btn-primario">
-        <i class="fas fa-info-circle"></i> <?php _e('Saiba mais', 'intranet'); ?>
+    <h2><?php echo esc_html(get_theme_mod('hero_title', 'Bem-vindo à Intranet')); ?></h2>
+    <p><?php echo esc_html(get_theme_mod('hero_description', 'Um espaço pensado para você, servidor público de Três Corações, com acesso rápido a informações, documentos e serviços essenciais.')); ?></p>
+    <a href="<?php echo esc_url(get_theme_mod('hero_btn_url', '/intranet')); ?>" class="btn-primario">
+        <i class="fas fa-info-circle"></i> <?php echo esc_html(get_theme_mod('hero_btn_text', 'Saiba mais')); ?>
     </a>
 </div>
 

@@ -631,6 +631,76 @@ function intranet_customize_register($wp_customize) {
         'type'        => 'number',
         'input_attrs' => array('min' => 60, 'max' => 500, 'step' => 10),
     ));
+
+    // === Seção: Hero Moderno ===
+    $wp_customize->add_section('intranet_hero_section', array(
+        'title'    => 'Hero Moderno',
+        'priority' => 35,
+    ));
+
+    // --- Título do Hero ---
+    $wp_customize->add_setting('hero_title', array(
+        'default'           => 'Bem-vindo à Intranet',
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    $wp_customize->add_control('hero_title', array(
+        'label'   => 'Título',
+        'section' => 'intranet_hero_section',
+        'type'    => 'text',
+    ));
+
+    // --- Descrição do Hero ---
+    $wp_customize->add_setting('hero_description', array(
+        'default'           => 'Um espaço pensado para você, servidor público de Três Corações, com acesso rápido a informações, documentos e serviços essenciais.',
+        'sanitize_callback' => 'sanitize_textarea_field',
+    ));
+    $wp_customize->add_control('hero_description', array(
+        'label'   => 'Descrição',
+        'section' => 'intranet_hero_section',
+        'type'    => 'textarea',
+    ));
+
+    // --- Texto do Botão ---
+    $wp_customize->add_setting('hero_btn_text', array(
+        'default'           => 'Saiba mais',
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    $wp_customize->add_control('hero_btn_text', array(
+        'label'   => 'Texto do Botão',
+        'section' => 'intranet_hero_section',
+        'type'    => 'text',
+    ));
+
+    // --- URL do Botão ---
+    $wp_customize->add_setting('hero_btn_url', array(
+        'default'           => '/intranet',
+        'sanitize_callback' => 'esc_url_raw',
+    ));
+    $wp_customize->add_control('hero_btn_url', array(
+        'label'   => 'Link do Botão',
+        'section' => 'intranet_hero_section',
+        'type'    => 'url',
+    ));
+
+    // --- Cor Inicial do Degradê ---
+    $wp_customize->add_setting('hero_gradient_start', array(
+        'default'           => '#006494',
+        'sanitize_callback' => 'sanitize_hex_color',
+    ));
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'hero_gradient_start', array(
+        'label'   => 'Cor Inicial do Degradê',
+        'section' => 'intranet_hero_section',
+    )));
+
+    // --- Cor Final do Degradê ---
+    $wp_customize->add_setting('hero_gradient_end', array(
+        'default'           => '#003554',
+        'sanitize_callback' => 'sanitize_hex_color',
+    ));
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'hero_gradient_end', array(
+        'label'   => 'Cor Final do Degradê',
+        'section' => 'intranet_hero_section',
+    )));
 }
 add_action('customize_register', 'intranet_customize_register');
 
@@ -683,6 +753,21 @@ function intranet_login_dynamic_css() {
     </style>';
 }
 add_action('login_head', 'intranet_login_dynamic_css');
+
+// Injetar CSS dinâmico do Hero Moderno
+function intranet_hero_dynamic_css() {
+    if (!is_front_page()) return;
+
+    $gradient_start = get_theme_mod('hero_gradient_start', '#006494');
+    $gradient_end   = get_theme_mod('hero_gradient_end', '#003554');
+
+    echo '<style id="intranet-hero-dynamic">
+        .hero-moderno {
+            background: linear-gradient(135deg, ' . esc_attr($gradient_start) . ', ' . esc_attr($gradient_end) . ') !important;
+        }
+    </style>';
+}
+add_action('wp_head', 'intranet_hero_dynamic_css');
 
 // Função auxiliar para escurecer uma cor hex
 function darken_hex($hex, $percent) {
