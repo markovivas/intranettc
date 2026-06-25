@@ -835,16 +835,6 @@ body {
   box-shadow: var(--sombra-hover);
 }
 
-.atalho-card:hover:nth-child(1) { border-color: var(--roxo); }
-.atalho-card:hover:nth-child(2) { border-color: var(--azul-brilhante); }
-.atalho-card:hover:nth-child(3) { border-color: var(--laranja); }
-.atalho-card:hover:nth-child(4) { border-color: var(--vermelho); }
-.atalho-card:hover:nth-child(5) { border-color: var(--azul-escuro); }
-.atalho-card:hover:nth-child(6) { border-color: var(--roxo); }
-.atalho-card:hover:nth-child(7) { border-color: var(--azul-principal); }
-.atalho-card:hover:nth-child(8) { border-color: var(--amarelo); }
-.atalho-card:hover:nth-child(9) { border-color: var(--verde); }
-
 .atalho-card i {
   font-size: 1.8rem;
   margin-bottom: 15px;
@@ -856,17 +846,6 @@ body {
   justify-content: center;
   transition: var(--transicao);
 }
-
-/* Cores dos ícones (personalizáveis) */
-.atalho-card:nth-child(1) i { background: rgba(156, 39, 176, 0.1); color: var(--roxo); }
-.atalho-card:nth-child(2) i { background: rgba(0, 166, 251, 0.1); color: var(--azul-brilhante); }
-.atalho-card:nth-child(3) i { background: rgba(255, 152, 0, 0.1); color: var(--laranja); }
-.atalho-card:nth-child(4) i { background: rgba(244, 67, 54, 0.1); color: var(--vermelho); }
-.atalho-card:nth-child(5) i { background: rgba(0, 53, 84, 0.1); color: var(--azul-escuro); }
-.atalho-card:nth-child(6) i { background: rgba(156, 39, 176, 0.1); color: var(--roxo); }
-.atalho-card:nth-child(7) i { background: rgba(0, 100, 148, 0.1); color: var(--azul-principal); }
-.atalho-card:nth-child(8) i { background: rgba(255, 183, 0, 0.1); color: var(--amarelo); }
-.atalho-card:nth-child(9) i { background: rgba(76, 175, 80, 0.1); color: var(--verde); }
 
 .atalho-card:hover i {
   transform: scale(1.1);
