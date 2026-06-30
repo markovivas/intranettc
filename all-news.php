@@ -13,7 +13,7 @@ get_header(); ?>
         $paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
         $args = array(
           'post_type' => 'post',
-          'posts_per_page' => 9,
+          'posts_per_page' => 12,
           'paged' => $paged,
           'post_status' => 'publish'
         );
@@ -42,11 +42,14 @@ get_header(); ?>
               </div>
             </article>
           <?php endwhile;
-          the_posts_pagination(array(
+          echo '<div class="pagination">';
+          echo paginate_links(array(
+            'total' => $query->max_num_pages,
             'mid_size' => 2,
             'prev_text' => __('Anterior', 'intranet'),
             'next_text' => __('Próximo', 'intranet'),
           ));
+          echo '</div>';
           wp_reset_postdata();
         else :
           echo '<p>' . __('Nenhuma notícia encontrada.', 'intranet') . '</p>';
