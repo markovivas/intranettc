@@ -35,43 +35,7 @@
     </section>
 
     <div class="container">
-      <!-- Atalhos Rápidos -->
-      <section class="atalhos-modernos">
-    <div class="atalhos-grid">
-        <?php
-        $atalhos_defaults = array(
-            1  => array('label' => 'Artes',              'url' => '/artes',                          'icon' => 'fa-solid fa-palette'),
-            2  => array('label' => 'Empregos',           'url' => '/empregos',                       'icon' => 'fas fa-file-alt'),
-            3  => array('label' => 'Eventos',            'url' => '/calendario',                     'icon' => 'fas fa-calendar-alt'),
-            4  => array('label' => 'Formulários',        'url' => '/formularios',                    'icon' => 'fas fa-folder-open'),
-            5  => array('label' => 'Helpdesk',           'url' => '/helpdesk',                       'icon' => 'fas fa-headset'),
-            6  => array('label' => 'Notícias',           'url' => '/noticias',                       'icon' => 'fas fa-newspaper'),
-            7  => array('label' => 'Recursos Humanos',   'url' => '/rh-recursos-humanos/',           'icon' => 'fas fa-money-check-dollar'),
-            8  => array('label' => 'WebMail',            'url' => 'https://webmail.trescoracoes.mg.gov.br', 'icon' => 'fas fa-envelope'),
-            9  => array('label' => 'WhatsApp',           'url' => 'https://web.whatsapp.com/',        'icon' => 'fab fa-whatsapp'),
-            10 => array('label' => '',                   'url' => '',                                'icon' => 'fas fa-plus'),
-            11 => array('label' => '',                   'url' => '',                                'icon' => 'fas fa-plus'),
-            12 => array('label' => '',                   'url' => '',                                'icon' => 'fas fa-plus'),
-            13 => array('label' => '',                   'url' => '',                                'icon' => 'fas fa-plus'),
-            14 => array('label' => '',                   'url' => '',                                'icon' => 'fas fa-plus'),
-            15 => array('label' => '',                   'url' => '',                                'icon' => 'fas fa-plus'),
-        );
-        for ($i = 1; $i <= 15; $i++) :
-            $d = $atalhos_defaults[$i];
-            $label = get_theme_mod("atalho_{$i}_label", $d['label']);
-            if (empty($label)) continue;
-            $url  = get_theme_mod("atalho_{$i}_url", $d['url']);
-            $icon = get_theme_mod("atalho_{$i}_icon", $d['icon']);
-            $target = strpos($url, 'http') === 0 ? ' target="_blank" rel="noopener noreferrer"' : '';
-        ?>
-        <a href="<?php echo esc_url($url); ?>" class="atalho-card"<?php echo $target; ?>>
-            <i class="<?php echo esc_attr($icon); ?>"></i>
-            <span><?php echo esc_html($label); ?></span>
-        </a>
-        <?php endfor; ?>
-    </div>
-</section>
-
+      <?php intranet_render_atalhos(); ?>
 
       <!-- Notícias -->
       <section class="noticias-modernas">

@@ -2,6 +2,7 @@
 function intranet_scripts() {
     wp_enqueue_style('intranet-style', get_stylesheet_uri());
     wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+    wp_enqueue_style('dashicons');
 
     // Adiciona o script para o menu mobile
     wp_enqueue_script(
@@ -13,6 +14,11 @@ function intranet_scripts() {
     );
 }
 add_action('wp_enqueue_scripts', 'intranet_scripts');
+
+function intranet_customizer_scripts() {
+    wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+}
+add_action('customize_controls_enqueue_scripts', 'intranet_customizer_scripts');
 
 function intranet_menus() {
     register_nav_menus(array(
@@ -26,6 +32,9 @@ add_theme_support('post-thumbnails');
 
 // Suporte a tradução
 load_theme_textdomain('intranet', get_template_directory() . '/languages');
+
+// Centralized Atalhos Rápidos logic
+require_once get_template_directory() . '/inc/atalhos.php';
 
 // Registrar áreas de widgets
 function intranet_widgets() {
@@ -483,6 +492,28 @@ add_action('admin_bar_menu', 'remover_logo_wp_admin_bar', 999);
  * ===================================================================
  */
 
+function intranet_sanitize_atalhos_json($value) {
+    $decoded = json_decode($value, true);
+    if (!is_array($decoded)) {
+        return json_encode(intranet_atalhos_defaults());
+    }
+    $sanitized = array();
+    foreach ($decoded as $item) {
+        if (!is_array($item)) continue;
+        $label = isset($item['label']) ? sanitize_text_field($item['label']) : '';
+        $sanitized[] = array(
+            'label' => $label,
+            'url'   => isset($item['url']) ? esc_url_raw($item['url']) : '',
+            'icon'  => isset($item['icon']) ? sanitize_text_field($item['icon']) : '',
+            'color' => isset($item['color']) ? sanitize_hex_color($item['color']) : '#607D8B',
+        );
+    }
+    if (empty($sanitized)) {
+        return json_encode(intranet_atalhos_defaults());
+    }
+    return json_encode($sanitized);
+}
+
 // Registrar seções e campos no Personalizador do WordPress
 function intranet_customize_register($wp_customize) {
 
@@ -708,68 +739,17 @@ function intranet_customize_register($wp_customize) {
         'priority' => 40,
     ));
 
-    $atalhos_defaults = array(
-        1 => array('label' => 'Artes',              'url' => '/artes',                          'icon' => 'fa-solid fa-palette',           'color' => '#9C27B0'),
-        2 => array('label' => 'Empregos',           'url' => '/empregos',                       'icon' => 'fas fa-file-alt',               'color' => '#00a6fb'),
-        3 => array('label' => 'Eventos',            'url' => '/calendario',                     'icon' => 'fas fa-calendar-alt',           'color' => '#FF9800'),
-        4 => array('label' => 'Formulários',        'url' => '/formularios',                    'icon' => 'fas fa-folder-open',            'color' => '#F44336'),
-        5 => array('label' => 'Helpdesk',           'url' => '/helpdesk',                       'icon' => 'fas fa-headset',                'color' => '#003554'),
-        6 => array('label' => 'Notícias',           'url' => '/noticias',                       'icon' => 'fas fa-newspaper',              'color' => '#9C27B0'),
-        7 => array('label' => 'Recursos Humanos',   'url' => '/rh-recursos-humanos/',           'icon' => 'fas fa-money-check-dollar',     'color' => '#006494'),
-        8 => array('label' => 'WebMail',            'url' => 'https://webmail.trescoracoes.mg.gov.br', 'icon' => 'fas fa-envelope',        'color' => '#ffb700'),
-        9 => array('label' => 'WhatsApp',           'url' => 'https://web.whatsapp.com/',        'icon' => 'fab fa-whatsapp',               'color' => '#4CAF50'),
-        10 => array('label' => '',                   'url' => '',                                'icon' => '',                              'color' => '#607D8B'),
-        11 => array('label' => '',                   'url' => '',                                'icon' => '',                              'color' => '#607D8B'),
-        12 => array('label' => '',                   'url' => '',                                'icon' => '',                              'color' => '#607D8B'),
-        13 => array('label' => '',                   'url' => '',                                'icon' => '',                              'color' => '#607D8B'),
-        14 => array('label' => '',                   'url' => '',                                'icon' => '',                              'color' => '#607D8B'),
-        15 => array('label' => '',                   'url' => '',                                'icon' => '',                              'color' => '#607D8B'),
-    );
+    $wp_customize->add_setting('atalhos_data', array(
+        'default'           => json_encode(intranet_atalhos_defaults()),
+        'sanitize_callback' => 'intranet_sanitize_atalhos_json',
+        'transport'         => 'refresh',
+    ));
 
-    for ($i = 1; $i <= 15; $i++) {
-        $d = $atalhos_defaults[$i];
-
-        $wp_customize->add_setting("atalho_{$i}_label", array(
-            'default'           => $d['label'],
-            'sanitize_callback' => 'sanitize_text_field',
-        ));
-        $wp_customize->add_control("atalho_{$i}_label", array(
-            'label'       => "Atalho {$i} — Nome",
-            'description' => 'Deixe vazio para ocultar este atalho.',
-            'section'     => 'intranet_atalhos_section',
-            'type'        => 'text',
-        ));
-
-        $wp_customize->add_setting("atalho_{$i}_url", array(
-            'default'           => $d['url'],
-            'sanitize_callback' => 'esc_url_raw',
-        ));
-        $wp_customize->add_control("atalho_{$i}_url", array(
-            'label'   => "Atalho {$i} — URL",
-            'section' => 'intranet_atalhos_section',
-            'type'    => 'url',
-        ));
-
-        $wp_customize->add_setting("atalho_{$i}_icon", array(
-            'default'           => $d['icon'],
-            'sanitize_callback' => 'sanitize_text_field',
-        ));
-        $wp_customize->add_control("atalho_{$i}_icon", array(
-            'label'       => "Atalho {$i} — Classe do Ícone",
-            'description' => 'Ex: fas fa-home, fab fa-whatsapp',
-            'section'     => 'intranet_atalhos_section',
-            'type'        => 'text',
-        ));
-
-        $wp_customize->add_setting("atalho_{$i}_color", array(
-            'default'           => $d['color'],
-            'sanitize_callback' => 'sanitize_hex_color',
-        ));
-        $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, "atalho_{$i}_color", array(
-            'label'   => "Atalho {$i} — Cor",
-            'section' => 'intranet_atalhos_section',
-        )));
-    }
+    $wp_customize->add_control(new Intranet_Atalhos_Repeater_Control($wp_customize, 'atalhos_data', array(
+        'label'       => 'Atalhos',
+        'description' => 'Adicione, remova e reordene os atalhos. Deixe o campo "Nome" vazio para ocultar.',
+        'section'     => 'intranet_atalhos_section',
+    )));
 }
 add_action('customize_register', 'intranet_customize_register');
 
@@ -819,6 +799,7 @@ function intranet_login_dynamic_css() {
         #nav a:hover { color: ' . esc_attr($button_color) . '; }
         #backtoblog a { color: ' . esc_attr($text_color) . '66; }
         #backtoblog a:hover { color: ' . esc_attr($button_color) . '; }
+        .login .language-switcher { display: none !important; }
     </style>';
 }
 add_action('login_head', 'intranet_login_dynamic_css');
@@ -837,31 +818,6 @@ function intranet_hero_dynamic_css() {
     </style>';
 }
 add_action('wp_head', 'intranet_hero_dynamic_css');
-
-// Injetar CSS dinâmico dos Atalhos Rápidos
-function intranet_atalhos_dynamic_css() {
-    if (!is_front_page()) return;
-
-    $default_colors = array('#9C27B0', '#00a6fb', '#FF9800', '#F44336', '#003554', '#9C27B0', '#006494', '#ffb700', '#4CAF50', '#607D8B', '#607D8B', '#607D8B', '#607D8B', '#607D8B', '#607D8B');
-    $css = '';
-    for ($i = 1; $i <= 15; $i++) {
-        $color = get_theme_mod("atalho_{$i}_color", $default_colors[$i - 1]);
-        if (empty($color)) continue;
-        $hex = ltrim($color, '#');
-        if (strlen($hex) === 3) $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
-        $r = hexdec(substr($hex, 0, 2));
-        $g = hexdec(substr($hex, 2, 2));
-        $b = hexdec(substr($hex, 4, 2));
-        $rgba = "rgba({$r}, {$g}, {$b}, 0.1)";
-        $css .= ".atalho-card:nth-child({$i}) i { background: {$rgba}; color: {$color}; }";
-        $css .= ".atalho-card:hover:nth-child({$i}) { border-color: {$color}; }";
-    }
-
-    if (!empty($css)) {
-        echo '<style id="intranet-atalhos-dynamic">' . $css . '</style>';
-    }
-}
-add_action('wp_head', 'intranet_atalhos_dynamic_css');
 
 // Função auxiliar para escurecer uma cor hex
 function darken_hex($hex, $percent) {
@@ -1116,5 +1072,20 @@ function intranet_profile_upload_script() {
     <?php
 }
 add_action('admin_footer', 'intranet_profile_upload_script');
+
+// Ocultar seção "Foto de Perfil Personalizada" do plugin Aniversariantes do Dia
+function intranet_hide_plugin_avatar_field() {
+    if (!class_exists('AniversariantesDoDia')) return;
+    $screen = get_current_screen();
+    if (!$screen || $screen->id !== 'profile') return;
+    ?>
+    <script>
+    jQuery(document).ready(function($) {
+        $('h3:contains("Foto de Perfil Personalizada")').next('table.form-table').addBack().hide();
+    });
+    </script>
+    <?php
+}
+add_action('admin_footer', 'intranet_hide_plugin_avatar_field');
 
 ?>

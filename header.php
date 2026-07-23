@@ -34,11 +34,16 @@
       </button>
       
       <div class="user-menu">
-  <?php if (is_user_logged_in()) : 
+  <?php if (is_user_logged_in()) :
     $current_user = wp_get_current_user();
-    echo get_avatar($current_user->ID, 32, '', $current_user->display_name, ['class' => 'user-avatar', 'force_default' => false]);
-  else : ?>
-    <img src="<?php echo get_template_directory_uri(); ?>/assets/images/avatar-default.png" alt="Avatar" class="user-avatar" width="32" height="32">
+    $avatar_url = get_user_meta($current_user->ID, 'intranet_profile_photo', true);
+    if (empty($avatar_url)) {
+      $avatar_url = get_avatar_url($current_user->ID, array('size' => 64));
+    }
+  ?>
+    <a href="<?php echo admin_url('profile.php'); ?>" class="user-avatar" style="background-image: url('<?php echo esc_url($avatar_url); ?>')" title="<?php _e('Meu Perfil', 'intranet'); ?>"></a>
+  <?php else : ?>
+    <a href="<?php echo admin_url('profile.php'); ?>" class="user-avatar" style="background-image: url('<?php echo get_template_directory_uri(); ?>/assets/images/avatar-default.png')" title="<?php _e('Meu Perfil', 'intranet'); ?>"></a>
   <?php endif; ?>
 </div>
     </div>

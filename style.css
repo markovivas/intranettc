@@ -200,16 +200,15 @@ body {
 }
 
 .user-avatar {
-  width: 32px !important;
-  height: 32px !important;
-  border-radius: 50% !important;
-  background: var(--azul-principal);
-  color: var(--branco);
-  object-fit: cover !important;
-  display: block;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   border: 2px solid var(--azul-principal);
   cursor: pointer;
-  overflow: hidden;
+  flex-shrink: 0;
 }
 
 /* Botão Menu Mobile (Oculto no Desktop) */
