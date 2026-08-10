@@ -9,11 +9,7 @@
         <li><a href="<?php echo site_url('/wp-admin/profile.php'); ?>"><i class="fas fa-user"></i> <?php _e('Meu Perfil', 'intranet'); ?></a></li>
         <li><a href="<?php echo site_url('/calendario'); ?>"><i class="fas fa-calendar-alt"></i> <?php _e('Calendário', 'intranet'); ?></a></li>
         <li><a href="<?php echo site_url('/documentos'); ?>"><i class="fas fa-file-alt"></i> <?php _e('Documentos', 'intranet'); ?></a></li>
-        <li><a href="<?php echo site_url('/formularios'); ?>"><i class="fas fa-folder-open"></i> <?php _e('Formulários', 'intranet'); ?></a></li>
-        <li><a href="<?php echo site_url('/empregos'); ?>"><i class="fas fa-briefcase"></i> <?php _e('Empregos', 'intranet'); ?></a></li>
-        <li><a href="<?php echo site_url('/equipe'); ?>"><i class="fas fa-users"></i> <?php _e('Equipe', 'intranet'); ?></a></li>
         <li><a href="<?php echo site_url('/ramais'); ?>"><i class="fas fa-phone-alt"></i> <?php _e('Ramais', 'intranet'); ?></a></li>
-        <li><a href="<?php echo site_url('/configuracoes'); ?>"><i class="fas fa-cog"></i> <?php _e('Configurações', 'intranet'); ?></a></li>
       </ul>
     </nav>
   </aside>
