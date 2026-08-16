@@ -1087,5 +1087,24 @@ function intranet_hide_plugin_avatar_field() {
     <?php
 }
 add_action('admin_footer', 'intranet_hide_plugin_avatar_field');
+remove_action( 'personal_options_update', 'send_confirmation_on_profile_email' );
+
+// Atualizar e-mail diretamente sem confirmação
+function intranet_update_email_directly( $user_id ) {
+    if ( ! isset( $_POST['email'] ) ) return;
+
+    $new_email = trim( sanitize_email( $_POST['email'] ) );
+    $user = get_userdata( $user_id );
+
+    if ( ! $user || $user->user_email === $new_email ) return;
+    if ( ! is_email( $new_email ) ) return;
+
+    $email_owner = email_exists( $new_email );
+    if ( $email_owner && $email_owner !== $user_id ) return;
+
+    wp_update_user( array( 'ID' => $user_id, 'user_email' => $new_email ) );
+}
+add_action( 'personal_options_update', 'intranet_update_email_directly', 20 );
+add_action( 'edit_user_profile_update', 'intranet_update_email_directly', 20 );
 
 ?>

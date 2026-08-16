@@ -505,32 +505,55 @@ body {
 }
 
 .stats-card {
+  position: relative;
+  overflow: hidden;
   background: var(--branco);
   border-radius: var(--borda-radius);
   padding: 25px;
   box-shadow: var(--sombra);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: var(--transicao);
+}
+
+/* Barra de acento no topo do card */
+.stats-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--azul-principal), var(--azul-brilhante));
+  opacity: 0.85;
   transition: var(--transicao);
 }
 
 .stats-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  transform: translateY(-6px);
+  box-shadow: var(--sombra-hover);
+  border-color: rgba(0, 100, 148, 0.2);
+}
+
+.stats-card:hover::before {
+  height: 5px;
+  opacity: 1;
 }
 
 .stats-icon-wrapper {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 15px;
-  background: rgba(0, 100, 148, 0.1); /* Cor de fundo padrão */
+  margin-bottom: 18px;
+  background: linear-gradient(135deg, rgba(0, 100, 148, 0.12), rgba(0, 166, 251, 0.18));
+  box-shadow: inset 0 0 0 1px rgba(0, 100, 148, 0.08);
   transition: var(--transicao);
 }
 
 .stats-card:hover .stats-icon-wrapper {
-  transform: scale(1.1);
+  transform: scale(1.08) rotate(-3deg);
 }
 
 .stats-icon-wrapper i {
@@ -539,20 +562,29 @@ body {
 }
 
 .stats-card h4 {
-  font-size: 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   color: var(--azul-escuro);
-  margin: 0 0 10px;
+  margin: 0 0 12px;
 }
 
 .stats-value {
-  font-size: 1.8rem;
-  font-weight: 700;
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.2;
+  background: linear-gradient(135deg, var(--azul-principal), var(--azul-brilhante));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
   color: var(--azul-principal);
-  margin-bottom: 5px;
+  margin-bottom: 8px;
 }
 
 .stats-period {
   font-size: 0.85rem;
+  font-weight: 500;
   color: var(--azul-claro);
 }
 
