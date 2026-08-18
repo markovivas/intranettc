@@ -94,6 +94,8 @@
         </div>
       </section>
 
+      <?php echo do_shortcode('[proximo_pagamento]'); ?>
+
       <!-- Estatísticas -->
       <section class="estatisticas-modernas">
         <div class="section-header">

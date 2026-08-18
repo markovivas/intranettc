@@ -328,6 +328,391 @@ function intranet_previsao_tempo_shortcode() {
 }
 add_shortcode('temperatura', 'intranet_previsao_tempo_shortcode');
 
+function intranet_next_payment_defaults() {
+    return array(
+        'payment_date'        => '2026-08-06',
+        'payment_title'       => 'PRÓXIMO PAGAMENTO',
+        'payment_info_text'   => 'Pagamento / adiantamento dos servidores municipais',
+        'payment_icon'        => 'dashicons-calendar-alt',
+        'payment_image'       => '',
+        'payment_image_width' => 260,
+        'message_title'       => '',
+        'message_text'        => 'Fique atento à Intranet para saber dos próximos pagamentos e adiantamentos.',
+        'message_icon'        => 'dashicons-money-alt',
+        'bg_start'            => '#0b5fa5',
+        'bg_end'              => '#0a2f6b',
+        'accent_color'        => '#ffcb3d',
+        'text_color'          => '#ffffff',
+        'secondary_color'     => '#a9d6ff',
+        'message_color'       => '#ffffff',
+        'border_radius'       => 24,
+        'shadow_blur'         => 32,
+        'min_height'          => 220,
+    );
+}
+
+function intranet_next_payment_theme_mod_keys() {
+    return array(
+        'payment_date',
+        'payment_title',
+        'payment_info_text',
+        'payment_icon',
+        'payment_image',
+        'payment_image_width',
+        'message_title',
+        'message_text',
+        'message_icon',
+        'bg_start',
+        'bg_end',
+        'accent_color',
+        'text_color',
+        'secondary_color',
+        'message_color',
+        'border_radius',
+        'shadow_blur',
+        'min_height',
+    );
+}
+
+function intranet_get_next_payment_settings() {
+    $defaults = intranet_next_payment_defaults();
+    $legacy_settings = get_option('intranet_next_payment_settings', array());
+    $settings = array();
+
+    foreach (intranet_next_payment_theme_mod_keys() as $key) {
+        $fallback = $legacy_settings[$key] ?? $defaults[$key];
+        $settings[$key] = get_theme_mod('intranet_next_payment_' . $key, $fallback);
+    }
+
+    return wp_parse_args($settings, $defaults);
+}
+
+function intranet_sanitize_next_payment_settings($input) {
+    $defaults = intranet_next_payment_defaults();
+    $output = array();
+
+    $output['payment_date'] = sanitize_text_field($input['payment_date'] ?? $defaults['payment_date']);
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $output['payment_date'])) {
+        $output['payment_date'] = $defaults['payment_date'];
+    }
+
+    $output['payment_title'] = sanitize_text_field($input['payment_title'] ?? $defaults['payment_title']);
+    $output['payment_info_text'] = sanitize_text_field($input['payment_info_text'] ?? $defaults['payment_info_text']);
+    $output['payment_icon'] = sanitize_html_class($input['payment_icon'] ?? $defaults['payment_icon']);
+    $output['payment_image'] = esc_url_raw($input['payment_image'] ?? $defaults['payment_image']);
+    $output['payment_image_width'] = max(120, min(420, absint($input['payment_image_width'] ?? $defaults['payment_image_width'])));
+    $output['message_title'] = sanitize_text_field($input['message_title'] ?? $defaults['message_title']);
+    $output['message_text'] = sanitize_textarea_field($input['message_text'] ?? $defaults['message_text']);
+    $output['message_icon'] = sanitize_html_class($input['message_icon'] ?? $defaults['message_icon']);
+
+    foreach (array('bg_start', 'bg_end', 'accent_color', 'text_color', 'secondary_color', 'message_color') as $color_key) {
+        $output[$color_key] = sanitize_hex_color($input[$color_key] ?? $defaults[$color_key]) ?: $defaults[$color_key];
+    }
+
+    $output['border_radius'] = max(8, min(48, absint($input['border_radius'] ?? $defaults['border_radius'])));
+    $output['shadow_blur'] = max(0, min(80, absint($input['shadow_blur'] ?? $defaults['shadow_blur'])));
+    $output['min_height'] = max(160, min(420, absint($input['min_height'] ?? $defaults['min_height'])));
+
+    return $output;
+}
+
+function intranet_register_next_payment_setting() {
+    register_setting(
+        'intranet_next_payment_group',
+        'intranet_next_payment_settings',
+        'intranet_sanitize_next_payment_settings'
+    );
+}
+add_action('admin_init', 'intranet_register_next_payment_setting');
+
+function intranet_sanitize_next_payment_date($value) {
+    $value = sanitize_text_field($value);
+    return preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) ? $value : intranet_next_payment_defaults()['payment_date'];
+}
+
+function intranet_sanitize_next_payment_number($value, $min, $max, $default) {
+    $value = absint($value);
+    if ($value < $min || $value > $max) {
+        return $default;
+    }
+    return $value;
+}
+
+function intranet_next_payment_display_date($date_string) {
+    $timezone = function_exists('wp_timezone') ? wp_timezone() : new DateTimeZone(wp_timezone_string() ?: 'America/Sao_Paulo');
+
+    try {
+        $date = new DateTimeImmutable($date_string, $timezone);
+    } catch (Exception $e) {
+        $date = new DateTimeImmutable('2026-08-06', $timezone);
+    }
+
+    $months = array(
+        1 => 'JANEIRO',
+        2 => 'FEVEREIRO',
+        3 => 'MARÇO',
+        4 => 'ABRIL',
+        5 => 'MAIO',
+        6 => 'JUNHO',
+        7 => 'JULHO',
+        8 => 'AGOSTO',
+        9 => 'SETEMBRO',
+        10 => 'OUTUBRO',
+        11 => 'NOVEMBRO',
+        12 => 'DEZEMBRO',
+    );
+    $weekdays = array(
+        'Sunday'    => 'DOMINGO',
+        'Monday'    => 'SEGUNDA-FEIRA',
+        'Tuesday'   => 'TERÇA-FEIRA',
+        'Wednesday' => 'QUARTA-FEIRA',
+        'Thursday'  => 'QUINTA-FEIRA',
+        'Friday'    => 'SEXTA-FEIRA',
+        'Saturday'  => 'SÁBADO',
+    );
+
+    $month_index = (int) $date->format('n');
+    $weekday_key = $date->format('l');
+
+    return array(
+        'day' => $date->format('d'),
+        'month' => $months[$month_index] ?? strtoupper($date->format('F')),
+        'weekday' => $weekdays[$weekday_key] ?? strtoupper($weekday_key),
+    );
+}
+
+function intranet_render_next_payment_banner() {
+    $settings = intranet_get_next_payment_settings();
+    $date = intranet_next_payment_display_date($settings['payment_date']);
+    $shadow = '0 16px ' . absint($settings['shadow_blur']) . 'px rgba(4, 27, 61, 0.16)';
+    $separator = 'rgba(0, 180, 255, 0.38)';
+
+    ob_start();
+    ?>
+    <style>
+        .intranet-next-payment {
+            margin-bottom: 50px;
+        }
+        .intranet-next-payment-card {
+            display: grid;
+            grid-template-columns: minmax(220px, 30%) minmax(260px, 40%) minmax(220px, 30%);
+            align-items: center;
+            width: 100%;
+            min-height: <?php echo esc_attr($settings['min_height']); ?>px;
+            background: linear-gradient(135deg, <?php echo esc_attr($settings['bg_start']); ?> 0%, <?php echo esc_attr($settings['bg_end']); ?> 100%);
+            color: <?php echo esc_attr($settings['text_color']); ?>;
+            border-radius: <?php echo esc_attr($settings['border_radius']); ?>px;
+            box-shadow: <?php echo esc_attr($shadow); ?>;
+            overflow: hidden;
+            position: relative;
+        }
+        .intranet-next-payment-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at top left, rgba(255,255,255,0.06), transparent 26%),
+                linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0));
+            pointer-events: none;
+        }
+        .intranet-next-payment-pane {
+            position: relative;
+            z-index: 1;
+            padding: 30px 28px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 12px;
+        }
+        .intranet-next-payment-pane + .intranet-next-payment-pane {
+            border-left: 2px solid <?php echo esc_attr($separator); ?>;
+        }
+        .intranet-next-payment-media {
+            align-items: center;
+            text-align: center;
+        }
+        .intranet-next-payment-media img {
+            width: 100%;
+            max-width: <?php echo esc_attr($settings['payment_image_width']); ?>px;
+            height: auto;
+            display: block;
+            object-fit: contain;
+            margin: 0 auto;
+        }
+        .intranet-next-payment-fallback {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 22px 24px;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.08);
+            color: <?php echo esc_attr($settings['text_color']); ?>;
+            font-size: clamp(1.3rem, 2.2vw, 2rem);
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            line-height: 1.2;
+        }
+        .intranet-next-payment-date {
+            display: grid;
+            grid-template-columns: 76px 1fr;
+            align-items: center;
+            column-gap: 20px;
+        }
+        .intranet-next-payment-badge,
+        .intranet-next-payment-message-icon {
+            width: 76px;
+            height: 76px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, rgba(32, 167, 255, 0.95), rgba(4, 109, 212, 0.95));
+            color: #ffffff;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.18);
+            font-size: 30px;
+            flex: 0 0 auto;
+        }
+        .intranet-next-payment-badge .dashicons,
+        .intranet-next-payment-message-icon .dashicons {
+            width: 30px;
+            height: 30px;
+            font-size: 30px;
+        }
+        .intranet-next-payment-date-main {
+            display: block;
+            font-size: clamp(1.7rem, 3vw, 2.9rem);
+            font-weight: 800;
+            line-height: 0.95;
+            letter-spacing: -0.03em;
+            text-transform: uppercase;
+        }
+        .intranet-next-payment-date-main .date-full {
+            display: block;
+            white-space: nowrap;
+        }
+        .intranet-next-payment-date-main .date-day {
+            margin-right: 10px;
+        }
+        .intranet-next-payment-date-main small {
+            font-size: inherit;
+            font-weight: 700;
+            letter-spacing: inherit;
+        }
+        .intranet-next-payment-weekday {
+            color: <?php echo esc_attr($settings['accent_color']); ?>;
+            font-size: clamp(0.95rem, 1.45vw, 1.3rem);
+            font-weight: 800;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+        .intranet-next-payment-date-copy {
+            min-width: 0;
+        }
+        .intranet-next-payment-message {
+            display: grid;
+            grid-template-columns: 76px 1fr;
+            align-items: center;
+            column-gap: 18px;
+        }
+        .intranet-next-payment-message-title {
+            margin: 0;
+            color: <?php echo esc_attr($settings['text_color']); ?>;
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+        .intranet-next-payment-message-text {
+            margin: 0;
+            color: <?php echo esc_attr($settings['message_color']); ?>;
+            font-size: clamp(1rem, 1.55vw, 1.08rem);
+            line-height: 1.35;
+            max-width: 22ch;
+            word-break: break-word;
+        }
+        @media (max-width: 1024px) {
+            .intranet-next-payment-card {
+                grid-template-columns: 0.95fr 1.25fr 1fr;
+            }
+            .intranet-next-payment-pane {
+                padding: 24px 20px;
+            }
+            .intranet-next-payment-date-main .date-full {
+                white-space: normal;
+            }
+        }
+        @media (max-width: 767px) {
+            .intranet-next-payment-card {
+                grid-template-columns: 1fr;
+            }
+            .intranet-next-payment-pane + .intranet-next-payment-pane {
+                border-left: 0;
+                border-top: 2px solid <?php echo esc_attr($separator); ?>;
+            }
+            .intranet-next-payment-media,
+            .intranet-next-payment-date,
+            .intranet-next-payment-message {
+                text-align: center;
+            }
+            .intranet-next-payment-date,
+            .intranet-next-payment-message {
+                grid-template-columns: 1fr;
+                row-gap: 18px;
+                justify-items: center;
+            }
+            .intranet-next-payment-message-text {
+                max-width: none;
+            }
+            .intranet-next-payment-date-main .date-full {
+                white-space: normal;
+            }
+        }
+    </style>
+    <section class="intranet-next-payment" aria-label="<?php echo esc_attr__('Próximo pagamento', 'intranet'); ?>">
+        <div class="intranet-next-payment-card">
+            <div class="intranet-next-payment-pane intranet-next-payment-media">
+                <?php if (!empty($settings['payment_image'])) : ?>
+                    <img src="<?php echo esc_url($settings['payment_image']); ?>" alt="<?php echo esc_attr($settings['payment_title']); ?>">
+                <?php else : ?>
+                    <div class="intranet-next-payment-fallback"><?php echo esc_html($settings['payment_title']); ?></div>
+                <?php endif; ?>
+            </div>
+            <div class="intranet-next-payment-pane intranet-next-payment-date">
+                <div class="intranet-next-payment-badge">
+                    <span class="dashicons <?php echo esc_attr($settings['payment_icon']); ?>" aria-hidden="true"></span>
+                </div>
+                <div class="intranet-next-payment-date-copy">
+                    <div class="intranet-next-payment-date-main">
+                        <span class="date-full">
+                            <span class="date-day"><?php echo esc_html($date['day']); ?></span><small><?php echo esc_html('DE ' . $date['month']); ?></small>
+                        </span>
+                    </div>
+                    <div class="intranet-next-payment-weekday"><?php echo esc_html($date['weekday']); ?></div>
+                </div>
+            </div>
+            <div class="intranet-next-payment-pane intranet-next-payment-message">
+                <div class="intranet-next-payment-message-icon">
+                    <span class="dashicons <?php echo esc_attr($settings['message_icon']); ?>" aria-hidden="true"></span>
+                </div>
+                <div class="intranet-next-payment-message-copy">
+                    <?php if (!empty($settings['message_title'])) : ?>
+                        <h3 class="intranet-next-payment-message-title"><?php echo esc_html($settings['message_title']); ?></h3>
+                    <?php endif; ?>
+                    <p class="intranet-next-payment-message-text"><?php echo esc_html($settings['message_text']); ?></p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <?php
+    return ob_get_clean();
+}
+
+function intranet_next_payment_shortcode() {
+    return intranet_render_next_payment_banner();
+}
+add_shortcode('proximo_pagamento', 'intranet_next_payment_shortcode');
+
 /*
  * ===================================================================
  * Bloquear site para visitantes não logados
@@ -750,6 +1135,193 @@ function intranet_customize_register($wp_customize) {
         'description' => 'Adicione, remova e reordene os atalhos. Deixe o campo "Nome" vazio para ocultar.',
         'section'     => 'intranet_atalhos_section',
     )));
+
+    // === Seção: Próximo Pagamento ===
+    $next_payment_defaults = intranet_next_payment_defaults();
+
+    $wp_customize->add_section('intranet_next_payment_section', array(
+        'title'       => 'Próximo Pagamento',
+        'priority'    => 45,
+        'description' => 'Configura o banner institucional exibido acima de Métricas Importantes na página inicial.',
+    ));
+
+    $wp_customize->add_setting('intranet_next_payment_payment_date', array(
+        'default'           => $next_payment_defaults['payment_date'],
+        'sanitize_callback' => 'intranet_sanitize_next_payment_date',
+    ));
+    $wp_customize->add_control('intranet_next_payment_payment_date', array(
+        'label'   => 'Data do pagamento',
+        'section' => 'intranet_next_payment_section',
+        'type'    => 'date',
+    ));
+
+    $wp_customize->add_setting('intranet_next_payment_payment_title', array(
+        'default'           => $next_payment_defaults['payment_title'],
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    $wp_customize->add_control('intranet_next_payment_payment_title', array(
+        'label'   => 'Título do PNG / fallback',
+        'section' => 'intranet_next_payment_section',
+        'type'    => 'text',
+    ));
+
+    $wp_customize->add_setting('intranet_next_payment_payment_icon', array(
+        'default'           => $next_payment_defaults['payment_icon'],
+        'sanitize_callback' => 'sanitize_html_class',
+    ));
+    $wp_customize->add_control('intranet_next_payment_payment_icon', array(
+        'label'       => 'Ícone da área da data',
+        'description' => 'Use uma classe Dashicons, por exemplo: dashicons-calendar-alt.',
+        'section'     => 'intranet_next_payment_section',
+        'type'        => 'text',
+    ));
+
+    $wp_customize->add_setting('intranet_next_payment_payment_image', array(
+        'default'           => $next_payment_defaults['payment_image'],
+        'sanitize_callback' => 'esc_url_raw',
+    ));
+    $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, 'intranet_next_payment_payment_image', array(
+        'label'       => 'Imagem PNG personalizada',
+        'description' => 'Faça upload de um PNG com fundo transparente.',
+        'section'     => 'intranet_next_payment_section',
+    )));
+
+    $wp_customize->add_setting('intranet_next_payment_payment_image_width', array(
+        'default'           => $next_payment_defaults['payment_image_width'],
+        'sanitize_callback' => function($value) use ($next_payment_defaults) {
+            return intranet_sanitize_next_payment_number($value, 120, 420, $next_payment_defaults['payment_image_width']);
+        },
+    ));
+    $wp_customize->add_control('intranet_next_payment_payment_image_width', array(
+        'label'       => 'Largura máxima da imagem (px)',
+        'section'     => 'intranet_next_payment_section',
+        'type'        => 'number',
+        'input_attrs' => array('min' => 120, 'max' => 420, 'step' => 10),
+    ));
+
+    $wp_customize->add_setting('intranet_next_payment_message_title', array(
+        'default'           => $next_payment_defaults['message_title'],
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    $wp_customize->add_control('intranet_next_payment_message_title', array(
+        'label'   => 'Título opcional da mensagem',
+        'section' => 'intranet_next_payment_section',
+        'type'    => 'text',
+    ));
+
+    $wp_customize->add_setting('intranet_next_payment_message_text', array(
+        'default'           => $next_payment_defaults['message_text'],
+        'sanitize_callback' => 'sanitize_textarea_field',
+    ));
+    $wp_customize->add_control('intranet_next_payment_message_text', array(
+        'label'   => 'Texto da mensagem',
+        'section' => 'intranet_next_payment_section',
+        'type'    => 'textarea',
+    ));
+
+    $wp_customize->add_setting('intranet_next_payment_message_icon', array(
+        'default'           => $next_payment_defaults['message_icon'],
+        'sanitize_callback' => 'sanitize_html_class',
+    ));
+    $wp_customize->add_control('intranet_next_payment_message_icon', array(
+        'label'       => 'Ícone da mensagem',
+        'description' => 'Exemplos: dashicons-money-alt, dashicons-groups, dashicons-businessperson.',
+        'section'     => 'intranet_next_payment_section',
+        'type'        => 'text',
+    ));
+
+    $wp_customize->add_setting('intranet_next_payment_bg_start', array(
+        'default'           => $next_payment_defaults['bg_start'],
+        'sanitize_callback' => 'sanitize_hex_color',
+    ));
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'intranet_next_payment_bg_start', array(
+        'label'   => 'Cor principal do fundo',
+        'section' => 'intranet_next_payment_section',
+    )));
+
+    $wp_customize->add_setting('intranet_next_payment_bg_end', array(
+        'default'           => $next_payment_defaults['bg_end'],
+        'sanitize_callback' => 'sanitize_hex_color',
+    ));
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'intranet_next_payment_bg_end', array(
+        'label'   => 'Cor secundária do fundo',
+        'section' => 'intranet_next_payment_section',
+    )));
+
+    $wp_customize->add_setting('intranet_next_payment_accent_color', array(
+        'default'           => $next_payment_defaults['accent_color'],
+        'sanitize_callback' => 'sanitize_hex_color',
+    ));
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'intranet_next_payment_accent_color', array(
+        'label'   => 'Cor do destaque',
+        'section' => 'intranet_next_payment_section',
+    )));
+
+    $wp_customize->add_setting('intranet_next_payment_text_color', array(
+        'default'           => $next_payment_defaults['text_color'],
+        'sanitize_callback' => 'sanitize_hex_color',
+    ));
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'intranet_next_payment_text_color', array(
+        'label'   => 'Cor do texto principal',
+        'section' => 'intranet_next_payment_section',
+    )));
+
+    $wp_customize->add_setting('intranet_next_payment_secondary_color', array(
+        'default'           => $next_payment_defaults['secondary_color'],
+        'sanitize_callback' => 'sanitize_hex_color',
+    ));
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'intranet_next_payment_secondary_color', array(
+        'label'   => 'Cor dos elementos secundários',
+        'section' => 'intranet_next_payment_section',
+    )));
+
+    $wp_customize->add_setting('intranet_next_payment_message_color', array(
+        'default'           => $next_payment_defaults['message_color'],
+        'sanitize_callback' => 'sanitize_hex_color',
+    ));
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'intranet_next_payment_message_color', array(
+        'label'   => 'Cor do texto da mensagem',
+        'section' => 'intranet_next_payment_section',
+    )));
+
+    $wp_customize->add_setting('intranet_next_payment_border_radius', array(
+        'default'           => $next_payment_defaults['border_radius'],
+        'sanitize_callback' => function($value) use ($next_payment_defaults) {
+            return intranet_sanitize_next_payment_number($value, 8, 48, $next_payment_defaults['border_radius']);
+        },
+    ));
+    $wp_customize->add_control('intranet_next_payment_border_radius', array(
+        'label'       => 'Raio das bordas',
+        'section'     => 'intranet_next_payment_section',
+        'type'        => 'number',
+        'input_attrs' => array('min' => 8, 'max' => 48, 'step' => 1),
+    ));
+
+    $wp_customize->add_setting('intranet_next_payment_shadow_blur', array(
+        'default'           => $next_payment_defaults['shadow_blur'],
+        'sanitize_callback' => function($value) use ($next_payment_defaults) {
+            return intranet_sanitize_next_payment_number($value, 0, 80, $next_payment_defaults['shadow_blur']);
+        },
+    ));
+    $wp_customize->add_control('intranet_next_payment_shadow_blur', array(
+        'label'       => 'Intensidade da sombra',
+        'section'     => 'intranet_next_payment_section',
+        'type'        => 'number',
+        'input_attrs' => array('min' => 0, 'max' => 80, 'step' => 1),
+    ));
+
+    $wp_customize->add_setting('intranet_next_payment_min_height', array(
+        'default'           => $next_payment_defaults['min_height'],
+        'sanitize_callback' => function($value) use ($next_payment_defaults) {
+            return intranet_sanitize_next_payment_number($value, 160, 420, $next_payment_defaults['min_height']);
+        },
+    ));
+    $wp_customize->add_control('intranet_next_payment_min_height', array(
+        'label'       => 'Altura mínima do banner',
+        'section'     => 'intranet_next_payment_section',
+        'type'        => 'number',
+        'input_attrs' => array('min' => 160, 'max' => 420, 'step' => 1),
+    ));
 }
 add_action('customize_register', 'intranet_customize_register');
 
