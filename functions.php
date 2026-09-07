@@ -1,4 +1,31 @@
-<?php
+﻿<?php
+/**
+ * Intranet TC â€” functions.php
+ *
+ * OrganizaÃ§Ã£o:
+ *  01. Scripts e estilos
+ *  02. Menus, thumbnails e traduÃ§Ã£o
+ *  03. Atalhos rÃ¡pidos (inc/atalhos.php)
+ *  04. Widgets / title-tag / thumbnails
+ *  05. MÃ­dias, breadcrumbs, lazy-load e leitura
+ *  06. Clima (Open-Meteo + shortcode [temperatura])
+ *  07. Banner prÃ³ximo pagamento ([proximo_pagamento])
+ *  08. RestriÃ§Ã£o para visitantes
+ *  09. CPT MÃ©tricas + meta boxes
+ *  10. Login: redirect, admin bar, customizer e tela
+ *  11. Perfil: upload, avatar e e-mail
+ *
+ * PadrÃ£o: 4 espaÃ§os, sem tabs, sem trailing whitespace.
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
+// ===================================================================
+// 01. Scripts e estilos
+// ===================================================================
+
 function intranet_scripts() {
     wp_enqueue_style('intranet-style', get_stylesheet_uri());
     wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
@@ -8,8 +35,8 @@ function intranet_scripts() {
     wp_enqueue_script(
         'intranet-mobile-menu',
         get_template_directory_uri() . '/assets/js/mobile-menu.js',
-        array(), // dependências
-        '1.0.0', // versão
+        array(), // dependÃªncias
+        '1.0.0', // versÃ£o
         true // carregar no footer
     );
 }
@@ -19,6 +46,10 @@ function intranet_customizer_scripts() {
     wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
 }
 add_action('customize_controls_enqueue_scripts', 'intranet_customizer_scripts');
+
+// ===================================================================
+// 02. Menus, thumbnails e traduÃ§Ã£o
+// ===================================================================
 
 function intranet_menus() {
     register_nav_menus(array(
@@ -30,13 +61,20 @@ add_action('after_setup_theme', 'intranet_menus');
 // Suporte a thumbnails
 add_theme_support('post-thumbnails');
 
-// Suporte a tradução
+// Suporte a traduÃ§Ã£o
 load_theme_textdomain('intranet', get_template_directory() . '/languages');
 
-// Centralized Atalhos Rápidos logic
+// ===================================================================
+// 03. Atalhos rÃ¡pidos (lÃ³gica centralizada)
+// ===================================================================
+
 require_once get_template_directory() . '/inc/atalhos.php';
 
-// Registrar áreas de widgets
+// ===================================================================
+// 04. Widgets, title-tag e tamanhos de imagem
+// ===================================================================
+
+// Registrar Ã¡reas de widgets
 function intranet_widgets() {
     register_sidebar(array(
         'name'          => __('Barra Lateral', 'intranet'),
@@ -48,9 +86,9 @@ function intranet_widgets() {
         'after_title'   => '</h3>',
     ));
     register_sidebar(array(
-        'name'          => __('Rodapé', 'intranet'),
+        'name'          => __('RodapÃ©', 'intranet'),
         'id'            => 'footer-1',
-        'description'   => __('Adicione widgets ao rodapé.', 'intranet'),
+        'description'   => __('Adicione widgets ao rodapÃ©.', 'intranet'),
         'before_widget' => '<div id="%1$s" class="widget %2$s">',
         'after_widget'  => '</div>',
         'before_title'  => '<h3 class="widget-title">',
@@ -59,11 +97,15 @@ function intranet_widgets() {
 }
 add_action('widgets_init', 'intranet_widgets');
 
-// Adicionar suporte a título dinâmico
+// Adicionar suporte a tÃ­tulo dinÃ¢mico
 add_theme_support('title-tag');
 
 // Personalizar o tamanho das thumbnails
 add_image_size('noticia-thumb', 300, 200, true);
+
+// ===================================================================
+// 05. MÃ­dias, breadcrumbs, lazy-load e tempo de leitura
+// ===================================================================
 
 // Suporte a WebP
 function webp_upload_mimes($existing_mimes) {
@@ -74,7 +116,7 @@ add_filter('mime_types', 'webp_upload_mimes');
 
 // Breadcrumbs
 function intranet_breadcrumbs() {
-    // Implementação dos breadcrumbs
+    // ImplementaÃ§Ã£o dos breadcrumbs
 }
 
 // Lazy loading
@@ -84,7 +126,7 @@ add_filter('wp_get_attachment_image_attributes', function($attr) {
 });
 
 // Tempo de leitura estimado
-if (!function_exists('estimated_reading_time')) {
+if ( ! function_exists('estimated_reading_time')) {
     function estimated_reading_time() {
         $content = get_post_field('post_content', get_the_ID());
         $word_count = str_word_count(strip_tags($content));
@@ -96,12 +138,16 @@ if (!function_exists('estimated_reading_time')) {
 // Reset de CSS - Shortcode
 add_filter('do_shortcode_tag', function($output, $tag) {
     if ($tag === 'mostra-calendario') {
-        return '<div style="all: initial !important;">' . $output . '</div>';
+        return '<div style="all: initial ! important;">' . $output . '</div>';
     }
     return $output;
 }, 10, 2);
 
-// Função auxiliar para mapear ícones do OpenWeatherMap para Font Awesome
+// ===================================================================
+// 06. Clima (Open-Meteo + shortcode [temperatura])
+// ===================================================================
+
+// FunÃ§Ã£o auxiliar para mapear Ã­cones do OpenWeatherMap para Font Awesome
 function intranet_get_open_meteo_icon_class($wmo_code, $is_day = 1) {
     $icon_map = [
         0 => ['day' => 'fas fa-sun', 'night' => 'fas fa-moon'], // Clear sky
@@ -130,21 +176,21 @@ function intranet_get_open_meteo_icon_class($wmo_code, $is_day = 1) {
     if (isset($icon_map[$wmo_code])) {
         return $is_day ? $icon_map[$wmo_code]['day'] : $icon_map[$wmo_code]['night'];
     }
-    return 'fas fa-question-circle'; // Ícone padrão
+    return 'fas fa-question-circle'; // Ãcone padrÃ£o
 }
 
-// Shortcode para Previsão do Tempo
+// Shortcode para PrevisÃ£o do Tempo
 function intranet_previsao_tempo_shortcode() {
-    // --- CONFIGURAÇÕES DA API ---
-    $latitude = '-21.79';  // Latitude de Três Corações, MG
-    $longitude = '-45.25'; // Longitude de Três Corações, MG
+    // --- CONFIGURAÃ‡Ã•ES DA API ---
+    $latitude = '-21.79';  // Latitude de TrÃªs CoraÃ§Ãµes, MG
+    $longitude = '-45.25'; // Longitude de TrÃªs CoraÃ§Ãµes, MG
     $timezone = 'America/Sao_Paulo';
 
     // Tenta obter os dados do cache
     $weather_data = get_transient('intranet_weather_data');
 
     if (false === $weather_data) {
-        // Se não houver cache, busca na API
+        // Se nÃ£o houver cache, busca na API
         $api_url = "https://api.open-meteo.com/v1/forecast?latitude={$latitude}&longitude={$longitude}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone={$timezone}&forecast_days=5";
 
         $response = wp_remote_get($api_url);
@@ -156,15 +202,15 @@ function intranet_previsao_tempo_shortcode() {
         $body = wp_remote_retrieve_body($response);
         $data = json_decode($body);
 
-        // Verifica se a chave de API foi inserida e se a resposta da API é válida
-        if (wp_remote_retrieve_response_code($response) !== 200 || !isset($data->current_weather)) {
+        // Verifica se a chave de API foi inserida e se a resposta da API Ã© vÃ¡lida
+        if (wp_remote_retrieve_response_code($response) !== 200 || ! isset($data->current_weather)) {
             ob_start();
             ?>
             <section class="previsao-tempo-moderna">
-                <div class="section-header"><h3><?php _e('Tempo em Três Corações', 'intranet'); ?></h3></div>
+                <div class="section-header"><h3><?php _e('Tempo em TrÃªs CoraÃ§Ãµes', 'intranet'); ?></h3></div>
                 <div class="tempo-container" style="background: #f8d7da; color: #721c24; display: block; text-align: center;">
                     <p style="margin: 0; font-weight: 500;">
-                        <?php _e('Não foi possível carregar os dados do tempo. Tente novamente mais tarde.', 'intranet'); ?>
+                        <?php _e('NÃ£o foi possÃ­vel carregar os dados do tempo. Tente novamente mais tarde.', 'intranet'); ?>
                     </p>
                 </div>
             </section>
@@ -182,19 +228,19 @@ function intranet_previsao_tempo_shortcode() {
     $current = $weather_data->current_weather;
     $daily = $weather_data->daily;
 
-    // Verificação de segurança para garantir que os dados existem
-    if (!isset($current) || !isset($daily)) {
-        return '<!-- Dados do tempo inválidos recebidos da API. -->';
+    // VerificaÃ§Ã£o de seguranÃ§a para garantir que os dados existem
+    if ( ! isset($current) || ! isset($daily)) {
+        return '<!-- Dados do tempo invÃ¡lidos recebidos da API. -->';
     }
 
     $temp_atual = round($current->temperature);
     $temp_max = round($daily->temperature_2m_max[0]);
     $temp_min = round($daily->temperature_2m_min[0]);
     $icon_class_atual = intranet_get_open_meteo_icon_class($current->weathercode, $current->is_day);
-    
-    // Descrições para os códigos de clima (simplificado)
+
+    // DescriÃ§Ãµes para os cÃ³digos de clima (simplificado)
     $wmo_descriptions = [
-        0 => 'Céu limpo', 1 => 'Quase limpo', 2 => 'Parcialmente nublado', 3 => 'Nublado',
+        0 => 'CÃ©u limpo', 1 => 'Quase limpo', 2 => 'Parcialmente nublado', 3 => 'Nublado',
         45 => 'Nevoeiro', 48 => 'Nevoeiro',
         51 => 'Garoa leve', 53 => 'Garoa', 55 => 'Garoa forte',
         61 => 'Chuva fraca', 63 => 'Chuva', 65 => 'Chuva forte',
@@ -202,15 +248,15 @@ function intranet_previsao_tempo_shortcode() {
         71 => 'Neve', 73 => 'Neve', 75 => 'Neve',
         95 => 'Trovoada', 96 => 'Trovoada', 99 => 'Trovoada'
     ];
-    $condicao = isset($wmo_descriptions[$current->weathercode]) ? $wmo_descriptions[$current->weathercode] : 'Condição desconhecida';
+    $condicao = isset($wmo_descriptions[$current->weathercode]) ? $wmo_descriptions[$current->weathercode] : 'CondiÃ§Ã£o desconhecida';
 
-    // Dias da semana em português
-    $dias_semana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+    // Dias da semana em portuguÃªs
+    $dias_semana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'SÃ¡b'];
 
     ob_start();
     ?>
     <style>
-        /* Estilos da Previsão do Tempo */
+        /* Estilos da PrevisÃ£o do Tempo */
         .previsao-tempo-moderna {
             margin-bottom: 50px;
         }
@@ -298,27 +344,27 @@ function intranet_previsao_tempo_shortcode() {
         /* Dark Mode desabilitado */
     </style>
     <section class="previsao-tempo-moderna">
-      <div class="section-header"><h3><?php _e('Tempo em Três Corações', 'intranet'); ?></h3></div>
+        <div class="section-header"><h3><?php _e('Tempo em TrÃªs CoraÃ§Ãµes', 'intranet'); ?></h3></div>
         <div class="tempo-container">
             <div class="tempo-atual">
                 <div class="tempo-atual-main">
                     <i class="<?php echo esc_attr($icon_class_atual); ?> tempo-icon-grande"></i>
-                    <div class="temperatura-grande"><?php echo esc_html($temp_atual); ?>°C</div>
+                    <div class="temperatura-grande"><?php echo esc_html($temp_atual); ?>Â°C</div>
                 </div>
                 <div class="tempo-atual-detalhes">
                     <div class="condicao-texto"><?php echo esc_html($condicao); ?></div>
-                    <div class="min-max">Máx: <?php echo esc_html($temp_max); ?>° / Mín: <?php echo esc_html($temp_min); ?>°</div>
+                    <div class="min-max">MÃ¡x: <?php echo esc_html($temp_max); ?>Â° / MÃ­n: <?php echo esc_html($temp_min); ?>Â°</div>
                 </div>
             </div>
             <div class="tempo-forecast">
-                <?php for ($i = 1; $i < 5; $i++) : // Começa do dia seguinte (índice 1) e pega 4 dias ?>
-                <?php if(isset($daily->time[$i])): ?>
-                    <div class="forecast-dia">
-                        <div class="dia-semana"><?php echo esc_html($dias_semana[date('w', strtotime($daily->time[$i]))]); ?></div>
-                        <i class="<?php echo esc_attr(intranet_get_open_meteo_icon_class($daily->weathercode[$i])); ?>"></i>
-                        <div class="temp-forecast"><?php echo esc_html(round($daily->temperature_2m_max[$i])); ?>°/<?php echo esc_html(round($daily->temperature_2m_min[$i])); ?>°</div>
-                    </div>
-                <?php endif; ?>
+                <?php for ($i = 1; $i < 5; $i++) : // ComeÃ§a do dia seguinte (Ã­ndice 1) e pega 4 dias ?>
+                    <?php if (isset($daily->time[$i])) : ?>
+                        <div class="forecast-dia">
+                            <div class="dia-semana"><?php echo esc_html($dias_semana[date('w', strtotime($daily->time[$i]))]); ?></div>
+                            <i class="<?php echo esc_attr(intranet_get_open_meteo_icon_class($daily->weathercode[$i])); ?>"></i>
+                            <div class="temp-forecast"><?php echo esc_html(round($daily->temperature_2m_max[$i])); ?>Â°/<?php echo esc_html(round($daily->temperature_2m_min[$i])); ?>Â°</div>
+                        </div>
+                    <?php endif; ?>
                 <?php endfor; ?>
             </div>
         </div>
@@ -328,16 +374,20 @@ function intranet_previsao_tempo_shortcode() {
 }
 add_shortcode('temperatura', 'intranet_previsao_tempo_shortcode');
 
+// ===================================================================
+// 07. Banner prÃ³ximo pagamento ([proximo_pagamento])
+// ===================================================================
+
 function intranet_next_payment_defaults() {
     return array(
         'payment_date'        => '2026-08-06',
-        'payment_title'       => 'PRÓXIMO PAGAMENTO',
+        'payment_title'       => 'PRÃ“XIMO PAGAMENTO',
         'payment_info_text'   => 'Pagamento / adiantamento dos servidores municipais',
         'payment_icon'        => 'dashicons-calendar-alt',
         'payment_image'       => '',
         'payment_image_width' => 260,
         'message_title'       => '',
-        'message_text'        => 'Fique atento à Intranet para saber dos próximos pagamentos e adiantamentos.',
+        'message_text'        => 'Fique atento Ã  Intranet para saber dos prÃ³ximos pagamentos e adiantamentos.',
         'message_icon'        => 'dashicons-money-alt',
         'bg_start'            => '#0b5fa5',
         'bg_end'              => '#0a2f6b',
@@ -392,7 +442,7 @@ function intranet_sanitize_next_payment_settings($input) {
     $output = array();
 
     $output['payment_date'] = sanitize_text_field($input['payment_date'] ?? $defaults['payment_date']);
-    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $output['payment_date'])) {
+    if ( ! preg_match('/^\d{4}-\d{2}-\d{2}$/', $output['payment_date'])) {
         $output['payment_date'] = $defaults['payment_date'];
     }
 
@@ -450,7 +500,7 @@ function intranet_next_payment_display_date($date_string) {
     $months = array(
         1 => 'JANEIRO',
         2 => 'FEVEREIRO',
-        3 => 'MARÇO',
+        3 => 'MARÃ‡O',
         4 => 'ABRIL',
         5 => 'MAIO',
         6 => 'JUNHO',
@@ -464,11 +514,11 @@ function intranet_next_payment_display_date($date_string) {
     $weekdays = array(
         'Sunday'    => 'DOMINGO',
         'Monday'    => 'SEGUNDA-FEIRA',
-        'Tuesday'   => 'TERÇA-FEIRA',
+        'Tuesday'   => 'TERÃ‡A-FEIRA',
         'Wednesday' => 'QUARTA-FEIRA',
         'Thursday'  => 'QUINTA-FEIRA',
         'Friday'    => 'SEXTA-FEIRA',
-        'Saturday'  => 'SÁBADO',
+        'Saturday'  => 'SÃBADO',
     );
 
     $month_index = (int) $date->format('n');
@@ -669,10 +719,10 @@ function intranet_render_next_payment_banner() {
             }
         }
     </style>
-    <section class="intranet-next-payment" aria-label="<?php echo esc_attr__('Próximo pagamento', 'intranet'); ?>">
+    <section class="intranet-next-payment" aria-label="<?php echo esc_attr__('PrÃ³ximo pagamento', 'intranet'); ?>">
         <div class="intranet-next-payment-card">
             <div class="intranet-next-payment-pane intranet-next-payment-media">
-                <?php if (!empty($settings['payment_image'])) : ?>
+                <?php if ( ! empty($settings['payment_image']) ) : ?>
                     <img src="<?php echo esc_url($settings['payment_image']); ?>" alt="<?php echo esc_attr($settings['payment_title']); ?>">
                 <?php else : ?>
                     <div class="intranet-next-payment-fallback"><?php echo esc_html($settings['payment_title']); ?></div>
@@ -696,7 +746,7 @@ function intranet_render_next_payment_banner() {
                     <span class="dashicons <?php echo esc_attr($settings['message_icon']); ?>" aria-hidden="true"></span>
                 </div>
                 <div class="intranet-next-payment-message-copy">
-                    <?php if (!empty($settings['message_title'])) : ?>
+                    <?php if ( ! empty($settings['message_title']) ) : ?>
                         <h3 class="intranet-next-payment-message-title"><?php echo esc_html($settings['message_title']); ?></h3>
                     <?php endif; ?>
                     <p class="intranet-next-payment-message-text"><?php echo esc_html($settings['message_text']); ?></p>
@@ -713,48 +763,44 @@ function intranet_next_payment_shortcode() {
 }
 add_shortcode('proximo_pagamento', 'intranet_next_payment_shortcode');
 
-/*
- * ===================================================================
- * Bloquear site para visitantes não logados
- * ===================================================================
- */
+// ===================================================================
+// 08. Bloquear site para visitantes nÃ£o logados
+// ===================================================================
 
 function bloquear_site_para_visitantes() {
-    // Se o usuário não estiver logado e não estiver em uma página de administração,
+    // Se o usuÃ¡rio nÃ£o estiver logado e nÃ£o estiver em uma pÃ¡gina de administraÃ§Ã£o,
     // redireciona para a tela de login.
-    if ( !is_user_logged_in() && !is_admin() ) {
+    if ( ! is_user_logged_in() && ! is_admin() ) {
         auth_redirect(); // envia para tela de login
     }
 }
 add_action( 'template_redirect', 'bloquear_site_para_visitantes' );
 
-/*
- * ===================================================================
- * Custom Post Type: Métricas Importantes
- * ===================================================================
- */
+// ===================================================================
+// 09. CPT MÃ©tricas + meta boxes
+// ===================================================================
 
 function intranet_cpt_metricas() {
     $labels = array(
-        'name'               => _x('Métricas', 'post type general name', 'intranet'),
-        'singular_name'      => _x('Métrica', 'post type singular name', 'intranet'),
-        'menu_name'          => _x('Métricas', 'admin menu', 'intranet'),
-        'name_admin_bar'     => _x('Métrica', 'add new on admin bar', 'intranet'),
+        'name'               => _x('MÃ©tricas', 'post type general name', 'intranet'),
+        'singular_name'      => _x('MÃ©trica', 'post type singular name', 'intranet'),
+        'menu_name'          => _x('MÃ©tricas', 'admin menu', 'intranet'),
+        'name_admin_bar'     => _x('MÃ©trica', 'add new on admin bar', 'intranet'),
         'add_new'            => _x('Adicionar Nova', 'metrica', 'intranet'),
-        'add_new_item'       => __('Adicionar Nova Métrica', 'intranet'),
-        'new_item'           => __('Nova Métrica', 'intranet'),
-        'edit_item'          => __('Editar Métrica', 'intranet'),
-        'view_item'          => __('Ver Métrica', 'intranet'),
-        'all_items'          => __('Todas as Métricas', 'intranet'),
-        'search_items'       => __('Buscar Métricas', 'intranet'),
-        'parent_item_colon'  => __('Métrica Pai:', 'intranet'),
-        'not_found'          => __('Nenhuma métrica encontrada.', 'intranet'),
-        'not_found_in_trash' => __('Nenhuma métrica encontrada na lixeira.', 'intranet')
+        'add_new_item'       => __('Adicionar Nova MÃ©trica', 'intranet'),
+        'new_item'           => __('Nova MÃ©trica', 'intranet'),
+        'edit_item'          => __('Editar MÃ©trica', 'intranet'),
+        'view_item'          => __('Ver MÃ©trica', 'intranet'),
+        'all_items'          => __('Todas as MÃ©tricas', 'intranet'),
+        'search_items'       => __('Buscar MÃ©tricas', 'intranet'),
+        'parent_item_colon'  => __('MÃ©trica Pai:', 'intranet'),
+        'not_found'          => __('Nenhuma mÃ©trica encontrada.', 'intranet'),
+        'not_found_in_trash' => __('Nenhuma mÃ©trica encontrada na lixeira.', 'intranet')
     );
 
     $args = array(
         'labels'             => $labels,
-        'public'             => false, // Não serão visíveis publicamente como posts normais
+        'public'             => false, // NÃ£o serÃ£o visÃ­veis publicamente como posts normais
         'publicly_queryable' => false,
         'show_ui'            => true, // Mostrar no painel de admin
         'show_in_menu'       => true,
@@ -763,20 +809,20 @@ function intranet_cpt_metricas() {
         'capability_type'    => 'post',
         'has_archive'        => false,
         'hierarchical'       => false,
-        'menu_position'      => 20, // Posição no menu do admin
-        'menu_icon'          => 'dashicons-chart-line', // Ícone
-        'supports'           => array('title'), // Suporta apenas título
+        'menu_position'      => 20, // PosiÃ§Ã£o no menu do admin
+        'menu_icon'          => 'dashicons-chart-line', // Ãcone
+        'supports'           => array('title'), // Suporta apenas tÃ­tulo
     );
 
     register_post_type('metrica', $args);
 }
 add_action('init', 'intranet_cpt_metricas');
 
-// Adicionar Meta Boxes (campos personalizados) para as Métricas
+// Adicionar Meta Boxes (campos personalizados) para as MÃ©tricas
 function intranet_metricas_meta_boxes() {
     add_meta_box(
         'intranet_metrica_details',
-        __('Detalhes da Métrica', 'intranet'),
+        __('Detalhes da MÃ©trica', 'intranet'),
         'intranet_metrica_details_callback',
         'metrica', // Adicionar ao CPT 'metrica'
         'normal',
@@ -797,11 +843,11 @@ function intranet_metrica_details_callback($post) {
         <input type="text" id="metrica_valor" name="metrica_valor" value="<?php echo esc_attr($valor); ?>" style="width:100%;">
     </p>
     <p>
-        <label for="metrica_periodo"><?php _e('Período/Descrição (Ex: em julho, nesse mês)', 'intranet'); ?></label><br>
+        <label for="metrica_periodo"><?php _e('PerÃ­odo/DescriÃ§Ã£o (Ex: em julho, nesse mÃªs)', 'intranet'); ?></label><br>
         <input type="text" id="metrica_periodo" name="metrica_periodo" value="<?php echo esc_attr($periodo); ?>" style="width:100%;">
     </p>
     <p>
-        <label for="metrica_icone"><?php _e('Ícone (Classe do Font Awesome, Ex: fas fa-users)', 'intranet'); ?></label><br>
+        <label for="metrica_icone"><?php _e('Ãcone (Classe do Font Awesome, Ex: fas fa-users)', 'intranet'); ?></label><br>
         <input type="text" id="metrica_icone" name="metrica_icone" value="<?php echo esc_attr($icone); ?>" style="width:100%;">
     </p>
     <?php
@@ -809,9 +855,15 @@ function intranet_metrica_details_callback($post) {
 
 // Salvar os dados da Meta Box
 function intranet_save_metrica_details($post_id) {
-    if (!isset($_POST['intranet_metrica_nonce']) || !wp_verify_nonce($_POST['intranet_metrica_nonce'], 'intranet_save_metrica_details')) return;
-    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
-    if (!current_user_can('edit_post', $post_id)) return;
+    if ( ! isset($_POST['intranet_metrica_nonce']) || ! wp_verify_nonce($_POST['intranet_metrica_nonce'], 'intranet_save_metrica_details') ) {
+        return;
+    }
+    if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) {
+        return;
+    }
+    if ( ! current_user_can('edit_post', $post_id) ) {
+        return;
+    }
 
     update_post_meta($post_id, '_metrica_valor', sanitize_text_field($_POST['metrica_valor'] ?? ''));
     update_post_meta($post_id, '_metrica_periodo', sanitize_text_field($_POST['metrica_periodo'] ?? ''));
@@ -819,72 +871,56 @@ function intranet_save_metrica_details($post_id) {
 }
 add_action('save_post_metrica', 'intranet_save_metrica_details');
 
-/*
- * ===================================================================
- * Redirecionamento Pós-Login
- * ===================================================================
- */
+// ===================================================================
+// 10. Login: redirect, admin bar, customizer e tela
+// ===================================================================
 
+// --- Redirecionamento pÃ³s-login ---
 function intranet_login_redirect( $redirect_to, $request, $user ) {
-    // Verifica se o usuário existe e tem uma função (role)
+    // Verifica se o usuÃ¡rio existe e tem uma funÃ§Ã£o (role)
     if ( isset( $user->roles ) && is_array( $user->roles ) ) {
-        // Se o usuário for um administrador, redireciona para o painel
+        // Se o usuÃ¡rio for um administrador, redireciona para o painel
         if ( in_array( 'administrator', $user->roles ) ) {
             return admin_url();
         } else {
-            // Para todos os outros usuários (ex: Assinantes), redireciona para a página inicial
+            // Para todos os outros usuÃ¡rios (ex: Assinantes), redireciona para a pÃ¡gina inicial
             return home_url();
         }
     }
-    // Para casos inesperados, retorna o redirecionamento padrão
+    // Para casos inesperados, retorna o redirecionamento padrÃ£o
     return $redirect_to;
 }
 add_filter( 'login_redirect', 'intranet_login_redirect', 10, 3 );
-// add_filter( 'login_redirect', 'intranet_login_redirect', 10, 3 );
 
-/*
- * ===================================================================
- * Esconder o menu "Painel" para não-administradores
- * ===================================================================
- */
-
+// --- Esconder o menu "Painel" para nÃ£o-administradores ---
 function hide_dashboard_menu_for_non_admin() {
     if ( ! current_user_can('administrator') ) {
 
         // Esconde o menu principal "Painel"
         remove_menu_page('index.php');
 
-        // Esconde subpáginas relacionadas
-        remove_submenu_page('index.php', 'index.php');        // Página inicial
-        remove_submenu_page('index.php', 'update-core.php');  // Atualizações
+        // Esconde subpÃ¡ginas relacionadas
+        remove_submenu_page('index.php', 'index.php');        // PÃ¡gina inicial
+        remove_submenu_page('index.php', 'update-core.php');  // AtualizaÃ§Ãµes
     }
 }
 add_action('admin_menu', 'hide_dashboard_menu_for_non_admin', 999);
 
-/*
- * ===================================================================
- * Remover o ícone do WordPress da barra de administração
- * ===================================================================
- */
+// --- Remover o Ã­cone do WordPress da barra de administraÃ§Ã£o ---
 function remover_logo_wp_admin_bar($wp_admin_bar) {
     $wp_admin_bar->remove_node('wp-logo');
 }
 add_action('admin_bar_menu', 'remover_logo_wp_admin_bar', 999);
 
-/*
- * ===================================================================
- * Personalização da Tela de Login
- * ===================================================================
- */
-
+// --- PersonalizaÃ§Ã£o da tela de login (Customizer + CSS/JS) ---
 function intranet_sanitize_atalhos_json($value) {
     $decoded = json_decode($value, true);
-    if (!is_array($decoded)) {
+    if ( ! is_array($decoded)) {
         return json_encode(intranet_atalhos_defaults());
     }
     $sanitized = array();
     foreach ($decoded as $item) {
-        if (!is_array($item)) continue;
+        if ( ! is_array($item)) continue;
         $label = isset($item['label']) ? sanitize_text_field($item['label']) : '';
         $sanitized[] = array(
             'label' => $label,
@@ -899,10 +935,10 @@ function intranet_sanitize_atalhos_json($value) {
     return json_encode($sanitized);
 }
 
-// Registrar seções e campos no Personalizador do WordPress
+// Registrar seÃ§Ãµes e campos no Personalizador do WordPress
 function intranet_customize_register($wp_customize) {
 
-    // === Seção: Tela de Login ===
+    // === SeÃ§Ã£o: Tela de Login ===
     $wp_customize->add_section('intranet_login_section', array(
         'title'    => 'Tela de Login',
         'priority' => 30,
@@ -928,67 +964,67 @@ function intranet_customize_register($wp_customize) {
         'section' => 'intranet_login_section',
     )));
 
-    // --- Rótulo Usuário ---
+    // --- RÃ³tulo UsuÃ¡rio ---
     $wp_customize->add_setting('login_label_username', array(
-        'default'           => 'Digite sua matrícula',
+        'default'           => 'Digite sua matrÃ­cula',
         'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('login_label_username', array(
-        'label'   => 'Rótulo do Campo Usuário',
+        'label'   => 'RÃ³tulo do Campo UsuÃ¡rio',
         'section' => 'intranet_login_section',
         'type'    => 'text',
     ));
 
-    // --- Rótulo Senha ---
+    // --- RÃ³tulo Senha ---
     $wp_customize->add_setting('login_label_password', array(
-        'default'           => 'Senha é a data de nascimento (somente números)',
+        'default'           => 'Senha Ã© a data de nascimento (somente nÃºmeros)',
         'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('login_label_password', array(
-        'label'   => 'Rótulo do Campo Senha',
+        'label'   => 'RÃ³tulo do Campo Senha',
         'section' => 'intranet_login_section',
         'type'    => 'text',
     ));
 
     // --- Texto da Mensagem ---
     $wp_customize->add_setting('login_message_text', array(
-        'default'           => 'Você está desconectado agora.',
+        'default'           => 'VocÃª estÃ¡ desconectado agora.',
         'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('login_message_text', array(
-        'label'   => 'Mensagem Acima do Formulário',
+        'label'   => 'Mensagem Acima do FormulÃ¡rio',
         'section' => 'intranet_login_section',
         'type'    => 'text',
     ));
 
-    // --- Texto do Botão ---
+    // --- Texto do BotÃ£o ---
     $wp_customize->add_setting('login_button_text', array(
         'default'           => 'Acessar',
         'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('login_button_text', array(
-        'label'   => 'Texto do Botão de Envio',
+        'label'   => 'Texto do BotÃ£o de Envio',
         'section' => 'intranet_login_section',
         'type'    => 'text',
     ));
 
-    // --- Cor do Botão ---
+    // --- Cor do BotÃ£o ---
     $wp_customize->add_setting('login_button_color', array(
         'default'           => '#2196F3',
         'sanitize_callback' => 'sanitize_hex_color',
     ));
     $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'login_button_color', array(
-        'label'   => 'Cor do Botão',
+        'label'   => 'Cor do BotÃ£o',
         'section' => 'intranet_login_section',
     )));
 
-    // --- Cor de Fundo do Formulário ---
+    // --- Cor de Fundo do FormulÃ¡rio ---
     $wp_customize->add_setting('login_form_bg', array(
         'default'           => '#ffffff',
         'sanitize_callback' => 'sanitize_hex_color',
     ));
     $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'login_form_bg', array(
-        'label'   => 'Cor de Fundo do Formulário',
+        'label'   => 'Cor de Fundo do FormulÃ¡rio',
         'section' => 'intranet_login_section',
     )));
 
@@ -1002,13 +1038,13 @@ function intranet_customize_register($wp_customize) {
         'section' => 'intranet_login_section',
     )));
 
-    // --- Cor de Fundo da Página ---
+    // --- Cor de Fundo da PÃ¡gina ---
     $wp_customize->add_setting('login_page_bg', array(
         'default'           => '#f0f2f5',
         'sanitize_callback' => 'sanitize_hex_color',
     ));
     $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'login_page_bg', array(
-        'label'   => 'Cor de Fundo da Página',
+        'label'   => 'Cor de Fundo da PÃ¡gina',
         'section' => 'intranet_login_section',
     )));
 
@@ -1048,79 +1084,79 @@ function intranet_customize_register($wp_customize) {
         'input_attrs' => array('min' => 60, 'max' => 500, 'step' => 10),
     ));
 
-    // === Seção: Hero Moderno ===
+    // === SeÃ§Ã£o: Hero Moderno ===
     $wp_customize->add_section('intranet_hero_section', array(
         'title'    => 'Hero Moderno',
         'priority' => 35,
     ));
 
-    // --- Título do Hero ---
+    // --- TÃ­tulo do Hero ---
     $wp_customize->add_setting('hero_title', array(
-        'default'           => 'Bem-vindo à Intranet',
+        'default'           => 'Bem-vindo Ã  Intranet',
         'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('hero_title', array(
-        'label'   => 'Título',
+        'label'   => 'TÃ­tulo',
         'section' => 'intranet_hero_section',
         'type'    => 'text',
     ));
 
-    // --- Descrição do Hero ---
+    // --- DescriÃ§Ã£o do Hero ---
     $wp_customize->add_setting('hero_description', array(
-        'default'           => 'Um espaço pensado para você, servidor público de Três Corações, com acesso rápido a informações, documentos e serviços essenciais.',
+        'default'           => 'Um espaÃ§o pensado para vocÃª, servidor pÃºblico de TrÃªs CoraÃ§Ãµes, com acesso rÃ¡pido a informaÃ§Ãµes, documentos e serviÃ§os essenciais.',
         'sanitize_callback' => 'sanitize_textarea_field',
     ));
     $wp_customize->add_control('hero_description', array(
-        'label'   => 'Descrição',
+        'label'   => 'DescriÃ§Ã£o',
         'section' => 'intranet_hero_section',
         'type'    => 'textarea',
     ));
 
-    // --- Texto do Botão ---
+    // --- Texto do BotÃ£o ---
     $wp_customize->add_setting('hero_btn_text', array(
         'default'           => 'Saiba mais',
         'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('hero_btn_text', array(
-        'label'   => 'Texto do Botão',
+        'label'   => 'Texto do BotÃ£o',
         'section' => 'intranet_hero_section',
         'type'    => 'text',
     ));
 
-    // --- URL do Botão ---
+    // --- URL do BotÃ£o ---
     $wp_customize->add_setting('hero_btn_url', array(
         'default'           => '/intranet',
         'sanitize_callback' => 'esc_url_raw',
     ));
     $wp_customize->add_control('hero_btn_url', array(
-        'label'   => 'Link do Botão',
+        'label'   => 'Link do BotÃ£o',
         'section' => 'intranet_hero_section',
         'type'    => 'url',
     ));
 
-    // --- Cor Inicial do Degradê ---
+    // --- Cor Inicial do DegradÃª ---
     $wp_customize->add_setting('hero_gradient_start', array(
         'default'           => '#006494',
         'sanitize_callback' => 'sanitize_hex_color',
     ));
     $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'hero_gradient_start', array(
-        'label'   => 'Cor Inicial do Degradê',
+        'label'   => 'Cor Inicial do DegradÃª',
         'section' => 'intranet_hero_section',
     )));
 
-    // --- Cor Final do Degradê ---
+    // --- Cor Final do DegradÃª ---
     $wp_customize->add_setting('hero_gradient_end', array(
         'default'           => '#003554',
         'sanitize_callback' => 'sanitize_hex_color',
     ));
     $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'hero_gradient_end', array(
-        'label'   => 'Cor Final do Degradê',
+        'label'   => 'Cor Final do DegradÃª',
         'section' => 'intranet_hero_section',
     )));
 
-    // === Seção: Atalhos Rápidos ===
+    // === SeÃ§Ã£o: Atalhos RÃ¡pidos ===
     $wp_customize->add_section('intranet_atalhos_section', array(
-        'title'    => 'Atalhos Rápidos',
+        'title'    => 'Atalhos RÃ¡pidos',
         'priority' => 40,
     ));
 
@@ -1136,13 +1172,13 @@ function intranet_customize_register($wp_customize) {
         'section'     => 'intranet_atalhos_section',
     )));
 
-    // === Seção: Próximo Pagamento ===
+    // === SeÃ§Ã£o: PrÃ³ximo Pagamento ===
     $next_payment_defaults = intranet_next_payment_defaults();
 
     $wp_customize->add_section('intranet_next_payment_section', array(
-        'title'       => 'Próximo Pagamento',
+        'title'       => 'PrÃ³ximo Pagamento',
         'priority'    => 45,
-        'description' => 'Configura o banner institucional exibido acima de Métricas Importantes na página inicial.',
+        'description' => 'Configura o banner institucional exibido acima de MÃ©tricas Importantes na pÃ¡gina inicial.',
     ));
 
     $wp_customize->add_setting('intranet_next_payment_payment_date', array(
@@ -1160,7 +1196,7 @@ function intranet_customize_register($wp_customize) {
         'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('intranet_next_payment_payment_title', array(
-        'label'   => 'Título do PNG / fallback',
+        'label'   => 'TÃ­tulo do PNG / fallback',
         'section' => 'intranet_next_payment_section',
         'type'    => 'text',
     ));
@@ -1170,7 +1206,7 @@ function intranet_customize_register($wp_customize) {
         'sanitize_callback' => 'sanitize_html_class',
     ));
     $wp_customize->add_control('intranet_next_payment_payment_icon', array(
-        'label'       => 'Ícone da área da data',
+        'label'       => 'Ãcone da Ã¡rea da data',
         'description' => 'Use uma classe Dashicons, por exemplo: dashicons-calendar-alt.',
         'section'     => 'intranet_next_payment_section',
         'type'        => 'text',
@@ -1182,7 +1218,7 @@ function intranet_customize_register($wp_customize) {
     ));
     $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, 'intranet_next_payment_payment_image', array(
         'label'       => 'Imagem PNG personalizada',
-        'description' => 'Faça upload de um PNG com fundo transparente.',
+        'description' => 'FaÃ§a upload de um PNG com fundo transparente.',
         'section'     => 'intranet_next_payment_section',
     )));
 
@@ -1193,7 +1229,7 @@ function intranet_customize_register($wp_customize) {
         },
     ));
     $wp_customize->add_control('intranet_next_payment_payment_image_width', array(
-        'label'       => 'Largura máxima da imagem (px)',
+        'label'       => 'Largura mÃ¡xima da imagem (px)',
         'section'     => 'intranet_next_payment_section',
         'type'        => 'number',
         'input_attrs' => array('min' => 120, 'max' => 420, 'step' => 10),
@@ -1204,7 +1240,7 @@ function intranet_customize_register($wp_customize) {
         'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('intranet_next_payment_message_title', array(
-        'label'   => 'Título opcional da mensagem',
+        'label'   => 'TÃ­tulo opcional da mensagem',
         'section' => 'intranet_next_payment_section',
         'type'    => 'text',
     ));
@@ -1224,7 +1260,7 @@ function intranet_customize_register($wp_customize) {
         'sanitize_callback' => 'sanitize_html_class',
     ));
     $wp_customize->add_control('intranet_next_payment_message_icon', array(
-        'label'       => 'Ícone da mensagem',
+        'label'       => 'Ãcone da mensagem',
         'description' => 'Exemplos: dashicons-money-alt, dashicons-groups, dashicons-businessperson.',
         'section'     => 'intranet_next_payment_section',
         'type'        => 'text',
@@ -1244,7 +1280,7 @@ function intranet_customize_register($wp_customize) {
         'sanitize_callback' => 'sanitize_hex_color',
     ));
     $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'intranet_next_payment_bg_end', array(
-        'label'   => 'Cor secundária do fundo',
+        'label'   => 'Cor secundÃ¡ria do fundo',
         'section' => 'intranet_next_payment_section',
     )));
 
@@ -1271,7 +1307,7 @@ function intranet_customize_register($wp_customize) {
         'sanitize_callback' => 'sanitize_hex_color',
     ));
     $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'intranet_next_payment_secondary_color', array(
-        'label'   => 'Cor dos elementos secundários',
+        'label'   => 'Cor dos elementos secundÃ¡rios',
         'section' => 'intranet_next_payment_section',
     )));
 
@@ -1317,7 +1353,7 @@ function intranet_customize_register($wp_customize) {
         },
     ));
     $wp_customize->add_control('intranet_next_payment_min_height', array(
-        'label'       => 'Altura mínima do banner',
+        'label'       => 'Altura mÃ­nima do banner',
         'section'     => 'intranet_next_payment_section',
         'type'        => 'number',
         'input_attrs' => array('min' => 160, 'max' => 420, 'step' => 1),
@@ -1331,14 +1367,14 @@ function intranet_login_enqueue_scripts() {
 }
 add_action('login_enqueue_scripts', 'intranet_login_enqueue_scripts');
 
-// Injetar CSS dinâmico baseado nas configurações do Personalizador
+// Injetar CSS dinÃ¢mico baseado nas configuraÃ§Ãµes do Personalizador
 function intranet_login_dynamic_css() {
     $button_color = get_theme_mod('login_button_color', '#2196F3');
     $form_bg      = get_theme_mod('login_form_bg', '#ffffff');
     $text_color   = get_theme_mod('login_text_color', '#333333');
     $page_bg      = get_theme_mod('login_page_bg', '#f0f2f5');
 
-    // Calcula versão mais escura do botão para o hover
+    // Calcula versÃ£o mais escura do botÃ£o para o hover
     $button_hover = esc_attr(sanitize_hex_color(darken_hex($button_color, 15)));
 
     echo '<style id="intranet-login-dynamic">
@@ -1371,27 +1407,27 @@ function intranet_login_dynamic_css() {
         #nav a:hover { color: ' . esc_attr($button_color) . '; }
         #backtoblog a { color: ' . esc_attr($text_color) . '66; }
         #backtoblog a:hover { color: ' . esc_attr($button_color) . '; }
-        .login .language-switcher { display: none !important; }
+        .login .language-switcher { display: none ! important; }
     </style>';
 }
 add_action('login_head', 'intranet_login_dynamic_css');
 
-// Injetar CSS dinâmico do Hero Moderno
+// Injetar CSS dinÃ¢mico do Hero Moderno
 function intranet_hero_dynamic_css() {
-    if (!is_front_page()) return;
+    if ( ! is_front_page()) return;
 
     $gradient_start = get_theme_mod('hero_gradient_start', '#006494');
     $gradient_end   = get_theme_mod('hero_gradient_end', '#003554');
 
     echo '<style id="intranet-hero-dynamic">
         .hero-moderno {
-            background: linear-gradient(135deg, ' . esc_attr($gradient_start) . ', ' . esc_attr($gradient_end) . ') !important;
+            background: linear-gradient(135deg, ' . esc_attr($gradient_start) . ', ' . esc_attr($gradient_end) . ') ! important;
         }
     </style>';
 }
 add_action('wp_head', 'intranet_hero_dynamic_css');
 
-// Função auxiliar para escurecer uma cor hex
+// FunÃ§Ã£o auxiliar para escurecer uma cor hex
 function darken_hex($hex, $percent) {
     $hex = ltrim($hex, '#');
     if (strlen($hex) === 3) {
@@ -1403,11 +1439,11 @@ function darken_hex($hex, $percent) {
     return sprintf('#%02x%02x%02x', $r, $g, $b);
 }
 
-// Personalizar o logo da tela de login (com tamanho configurável)
+// Personalizar o logo da tela de login (com tamanho configurÃ¡vel)
 function intranet_login_logo() {
     $logo_url = get_theme_mod('login_logo', get_template_directory_uri() . '/assets/images/logo.png');
     $logo_width = get_theme_mod('login_logo_width', '180');
-    echo '<style>#login h1 a { background-image: url(' . esc_url($logo_url) . ') !important; background-size: contain !important; width: ' . esc_attr($logo_width) . 'px !important; height: auto !important; }</style>';
+    echo '<style>#login h1 a { background-image: url(' . esc_url($logo_url) . ') ! important; background-size: contain ! important; width: ' . esc_attr($logo_width) . 'px ! important; height: auto ! important; }</style>';
 }
 add_action('login_head', 'intranet_login_logo');
 
@@ -1415,13 +1451,13 @@ add_action('login_head', 'intranet_login_logo');
 function intranet_login_translations($translated, $text, $domain) {
     if ($domain !== 'default') return $translated;
 
-    // Detecta se está na tela de login
+    // Detecta se estÃ¡ na tela de login
     $screen = function_exists('get_current_screen') ? get_current_screen() : null;
     $is_login_page = (isset($_GET['action']) && $_GET['action'] === 'logout')
         || (isset($_GET['loggedout']) && $_GET['loggedout'] === 'true')
         || (function_exists('get_current_screen') && $screen && isset($screen->id) && $screen->id === 'login')
         || (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === 'wp-login.php');
-    if (!$is_login_page) return $translated;
+    if ( ! $is_login_page) return $translated;
 
     $label_username = get_theme_mod('login_label_username', '');
     $label_password = get_theme_mod('login_label_password', '');
@@ -1430,18 +1466,18 @@ function intranet_login_translations($translated, $text, $domain) {
 
     $replacements = array();
 
-    if (!empty($label_username)) {
+    if ( ! empty($label_username)) {
         $replacements['Username or Email Address'] = $label_username;
         $replacements['Username'] = $label_username;
     }
-    if (!empty($label_password)) {
+    if ( ! empty($label_password)) {
         $replacements['Password'] = $label_password;
     }
-    if (!empty($button_text)) {
+    if ( ! empty($button_text)) {
         $replacements['Log In'] = $button_text;
         $replacements['Log in'] = $button_text;
     }
-    if (!empty($lost_pw_text)) {
+    if ( ! empty($lost_pw_text)) {
         $replacements['Lost your password?'] = $lost_pw_text;
     }
 
@@ -1455,18 +1491,18 @@ add_filter('gettext', 'intranet_login_translations', 10, 3);
 
 // Adicionar mensagem personalizada abaixo do logo
 function intranet_login_message() {
-    $message = get_theme_mod('login_message_text', 'Você está desconectado agora.');
+    $message = get_theme_mod('login_message_text', 'VocÃª estÃ¡ desconectado agora.');
     return '<p class="login-message">' . esc_html($message) . '</p>';
 }
 add_filter('login_message', 'intranet_login_message');
 
-// Adicionar imagem lateral e painel do formulário na tela de login
+// Adicionar imagem lateral e painel do formulÃ¡rio na tela de login
 function intranet_login_side_image() {
     $side_image_url = esc_url(get_theme_mod('login_side_image', get_template_directory_uri() . '/assets/images/maria-fumaca.jpg'));
     $back_text = get_theme_mod('login_back_text', '');
     $home_url = esc_url(home_url());
     $script = '<script>document.addEventListener("DOMContentLoaded",function(){'
-        . 'var l=document.getElementById("login");if(!l)return;'
+        . 'var l=document.getElementById("login");if(! l)return;'
         . 'var s=document.createElement("div");s.className="login-side-image";s.style.backgroundImage="url(' . $side_image_url . ')";l.appendChild(s);'
         . 'var p=document.createElement("div");p.className="login-form-panel";'
         . 'var h=l.querySelector("h1"),n=l.querySelector("#nav"),b=l.querySelector("#backtoblog");'
@@ -1480,25 +1516,23 @@ function intranet_login_side_image() {
 }
 add_action('login_head', 'intranet_login_side_image');
 
-/*
- * ===================================================================
- * Personalização da Página de Perfil do Admin
- * ===================================================================
- */
+// ===================================================================
+// 11. Perfil: upload, avatar, e-mail e mÃ­dia
+// ===================================================================
 
-// Conceder permissão de upload para Subscribers
+// Conceder permissÃ£o de upload para Subscribers
 function intranet_allow_subscriber_uploads() {
     $subscriber = get_role('subscriber');
-    if ($subscriber && !$subscriber->has_cap('upload_files')) {
+    if ($subscriber && ! $subscriber->has_cap('upload_files')) {
         $subscriber->add_cap('upload_files');
     }
 }
 add_action('init', 'intranet_allow_subscriber_uploads');
 
-// Permitir upload de mídia via AJAX para todos os logados
+// Permitir upload de mÃ­dia via AJAX para todos os logados
 function intranet_allow_upload_for_profile($response, $handler, $action) {
     if ($action === 'upload-attachment') {
-        if (!current_user_can('upload_files')) {
+        if ( ! current_user_can('upload_files') ) {
             $user = wp_get_current_user();
             if ($user->exists()) {
                 $user->add_cap('upload_files');
@@ -1509,27 +1543,37 @@ function intranet_allow_upload_for_profile($response, $handler, $action) {
 }
 add_filter('wp_prepare_attachment_for_js', 'intranet_allow_upload_for_profile', 10, 3);
 
-// Carregar CSS na página de perfil (somente para não-admins)
+// Carregar CSS na pÃ¡gina de perfil (somente para nÃ£o-admins)
 function intranet_admin_profile_styles($hook) {
-    if ($hook !== 'profile.php' && $hook !== 'user-edit.php') return;
-    if (current_user_can('administrator')) return;
+    if ($hook !== 'profile.php' && $hook !== 'user-edit.php') {
+        return;
+    }
+    if (current_user_can('administrator')) {
+        return;
+    }
     wp_enqueue_style('intranet-admin-profile', get_template_directory_uri() . '/assets/css/admin-profile.css', array(), '1.0.0');
     wp_enqueue_media();
 }
 add_action('admin_enqueue_scripts', 'intranet_admin_profile_styles');
 
-// Botão "Voltar para o Início" (somente para não-admins)
+// BotÃ£o "Voltar para o InÃ­cio" (somente para nÃ£o-admins)
 function intranet_profile_back_button() {
     $screen = function_exists('get_current_screen') ? get_current_screen() : null;
-    if (!$screen || $screen->id !== 'profile') return;
-    if (current_user_can('administrator')) return;
-    echo '<div class="intranet-back-home-wrap"><a href="' . esc_url(home_url()) . '" class="button intranet-back-home-btn"><i class="dashicons dashicons-admin-home"></i> Voltar para o Início</a></div>';
+    if ( ! $screen || $screen->id !== 'profile' ) {
+        return;
+    }
+    if (current_user_can('administrator')) {
+        return;
+    }
+    echo '<div class="intranet-back-home-wrap"><a href="' . esc_url(home_url()) . '" class="button intranet-back-home-btn"><i class="dashicons dashicons-admin-home"></i> Voltar para o InÃ­cio</a></div>';
 }
 add_action('admin_notices', 'intranet_profile_back_button');
 
-// Adicionar campo de foto do perfil (somente para não-admins)
+// Adicionar campo de foto do perfil (somente para nÃ£o-admins)
 function intranet_profile_picture_field($user) {
-    if (current_user_can('administrator')) return;
+    if (current_user_can('administrator')) {
+        return;
+    }
     $avatar_url = get_user_meta($user->ID, 'intranet_profile_photo', true);
     if (empty($avatar_url)) {
         $avatar_url = get_avatar_url($user->ID, array('size' => 200));
@@ -1568,7 +1612,9 @@ add_action('edit_user_profile', 'intranet_profile_picture_field');
 
 // Salvar foto do perfil
 function intranet_save_profile_picture($user_id) {
-    if (!isset($_POST['intranet_profile_nonce']) || !wp_verify_nonce($_POST['intranet_profile_nonce'], 'intranet_save_profile')) return;
+    if ( ! isset($_POST['intranet_profile_nonce']) || ! wp_verify_nonce($_POST['intranet_profile_nonce'], 'intranet_save_profile') ) {
+        return;
+    }
     if (isset($_POST['intranet_profile_photo'])) {
         $photo_url = esc_url_raw($_POST['intranet_profile_photo']);
         update_user_meta($user_id, 'intranet_profile_photo', $photo_url);
@@ -1576,9 +1622,11 @@ function intranet_save_profile_picture($user_id) {
 }
 add_action('profile_update', 'intranet_save_profile_picture');
 
-// Adicionar nonce de segurança (somente para não-admins)
+// Adicionar nonce de seguranÃ§a (somente para nÃ£o-admins)
 function intranet_profile_nonce_field($user) {
-    if (current_user_can('administrator')) return;
+    if (current_user_can('administrator')) {
+        return;
+    }
     wp_nonce_field('intranet_save_profile', 'intranet_profile_nonce');
 }
 add_action('show_user_profile', 'intranet_profile_nonce_field');
@@ -1591,13 +1639,15 @@ function intranet_custom_avatar($avatar, $id_or_email, $args) {
         $user_id = (int) $id_or_email;
     } elseif (is_string($id_or_email)) {
         $user = get_user_by('email', $id_or_email);
-        if ($user) $user_id = $user->ID;
+        if ($user) {
+            $user_id = $user->ID;
+        }
     } elseif (is_object($id_or_email)) {
         $user_id = (int) $id_or_email->user_id;
     }
     if ($user_id > 0) {
         $custom_photo = get_user_meta($user_id, 'intranet_profile_photo', true);
-        if (!empty($custom_photo)) {
+        if ( ! empty($custom_photo) ) {
             $size = isset($args['size']) ? $args['size'] : 96;
             $class = isset($args['class']) ? $args['class'] : 'avatar avatar-' . $size . ' photo';
             $avatar = '<img alt="" src="' . esc_url($custom_photo) . '" class="' . esc_attr($class) . '" height="' . esc_attr($size) . '" width="' . esc_attr($size) . '" loading="lazy">';
@@ -1607,76 +1657,101 @@ function intranet_custom_avatar($avatar, $id_or_email, $args) {
 }
 add_filter('get_avatar', 'intranet_custom_avatar', 10, 3);
 
-// Injetar JavaScript para upload de avatar no perfil (somente para não-admins)
+// Injetar JavaScript para upload de avatar no perfil (somente para nÃ£o-admins)
 function intranet_profile_upload_script() {
     $screen = function_exists('get_current_screen') ? get_current_screen() : null;
-    if (!$screen || $screen->id !== 'profile') return;
-    if (current_user_can('administrator')) return;
+    if ( ! $screen || $screen->id !== 'profile' ) {
+        return;
+    }
+    if (current_user_can('administrator')) {
+        return;
+    }
     ?>
     <script>
-    jQuery(document).ready(function($) {
-        var frame;
-        $('#intranet-upload-avatar').on('click', function(e) {
-            e.preventDefault();
-            if (frame) { frame.open(); return; }
-            frame = wp.media({
-                title: 'Selecionar Foto do Perfil',
-                button: { text: 'Usar esta foto' },
-                multiple: false,
-                library: { type: 'image' }
+        jQuery(document).ready(function($) {
+            var frame;
+            $('#intranet-upload-avatar').on('click', function(e) {
+                e.preventDefault();
+                if (frame) { frame.open(); return; }
+                frame = wp.media({
+                    title: 'Selecionar Foto do Perfil',
+                    button: { text: 'Usar esta foto' },
+                    multiple: false,
+                    library: { type: 'image' }
+                });
+                frame.on('select', function() {
+                    var attachment = frame.state().get('selection').first().toJSON();
+                    var url = attachment.sizes && attachment.sizes.medium ? attachment.sizes.medium.url : attachment.url;
+                    $('#intranet-avatar-preview').attr('src', url);
+                    $('#intranet-profile-photo').val(attachment.url);
+                });
+                frame.open();
             });
-            frame.on('select', function() {
-                var attachment = frame.state().get('selection').first().toJSON();
-                var url = attachment.sizes && attachment.sizes.medium ? attachment.sizes.medium.url : attachment.url;
-                $('#intranet-avatar-preview').attr('src', url);
-                $('#intranet-profile-photo').val(attachment.url);
+            $('#intranet-remove-avatar').on('click', function(e) {
+                e.preventDefault();
+                var defaultUrl = '<?php echo esc_js(get_avatar_url(0, array("size" => 200))); ?>';
+                $('#intranet-avatar-preview').attr('src', defaultUrl);
+                $('#intranet-profile-photo').val('');
             });
-            frame.open();
         });
-        $('#intranet-remove-avatar').on('click', function(e) {
-            e.preventDefault();
-            var defaultUrl = '<?php echo esc_js(get_avatar_url(0, array("size" => 200))); ?>';
-            $('#intranet-avatar-preview').attr('src', defaultUrl);
-            $('#intranet-profile-photo').val('');
-        });
-    });
     </script>
     <?php
 }
 add_action('admin_footer', 'intranet_profile_upload_script');
 
-// Ocultar seção "Foto de Perfil Personalizada" do plugin Aniversariantes do Dia
+// Ocultar seÃ§Ã£o "Foto de Perfil Personalizada" do plugin Aniversariantes do Dia
 function intranet_hide_plugin_avatar_field() {
-    if (!class_exists('AniversariantesDoDia')) return;
+    if ( ! class_exists('AniversariantesDoDia') ) {
+        return;
+    }
     $screen = get_current_screen();
-    if (!$screen || $screen->id !== 'profile') return;
+    if ( ! $screen || $screen->id !== 'profile' ) {
+        return;
+    }
     ?>
     <script>
-    jQuery(document).ready(function($) {
-        $('h3:contains("Foto de Perfil Personalizada")').next('table.form-table').addBack().hide();
-    });
+        jQuery(document).ready(function($) {
+            $('h3:contains("Foto de Perfil Personalizada")').next('table.form-table').addBack().hide();
+        });
     </script>
     <?php
 }
 add_action('admin_footer', 'intranet_hide_plugin_avatar_field');
 remove_action( 'personal_options_update', 'send_confirmation_on_profile_email' );
 
-// Atualizar e-mail diretamente sem confirmação
+// Atualizar e-mail diretamente sem confirmaÃ§Ã£o
 function intranet_update_email_directly( $user_id ) {
-    if ( ! isset( $_POST['email'] ) ) return;
+    if ( ! isset( $_POST['email'] ) ) {
+        return;
+    }
 
     $new_email = trim( sanitize_email( $_POST['email'] ) );
-    $user = get_userdata( $user_id );
+    $user      = get_userdata( $user_id );
 
-    if ( ! $user || $user->user_email === $new_email ) return;
-    if ( ! is_email( $new_email ) ) return;
+    if ( ! $user || $user->user_email === $new_email ) {
+        return;
+    }
+    if ( ! is_email( $new_email ) ) {
+        return;
+    }
 
     $email_owner = email_exists( $new_email );
-    if ( $email_owner && $email_owner !== $user_id ) return;
+    if ( $email_owner && $email_owner !== $user_id ) {
+        return;
+    }
 
     wp_update_user( array( 'ID' => $user_id, 'user_email' => $new_email ) );
 }
 add_action( 'personal_options_update', 'intranet_update_email_directly', 20 );
 add_action( 'edit_user_profile_update', 'intranet_update_email_directly', 20 );
 
-?>
+// Restringe a biblioteca de mÃ­dia para mostrar apenas os uploads do prÃ³prio usuÃ¡rio
+add_filter( 'ajax_query_attachments_args', 'filtrar_midia_por_usuario' );
+
+function filtrar_midia_por_usuario( $query ) {
+    // Se o usuÃ¡rio nÃ£o puder editar posts de outros (Ex: Assinantes), filtra as mÃ­dias
+    if ( ! current_user_can( 'edit_others_posts' ) ) {
+        $query['author'] = get_current_user_id();
+    }
+    return $query;
+}
