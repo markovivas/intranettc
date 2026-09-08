@@ -1646,3 +1646,17 @@ function estimated_reading_time() {
     font-size: 1.6rem;
   }
 }
+
+/*--------------------------------------------------------------
+# Padronização da Home (seções de plugins)
+# Widgets/shortcodes de plugins adotam os tokens e o ritmo do tema.
+--------------------------------------------------------------*/
+.aniversariantes-dia {
+  margin-bottom: 50px;
+}
+
+.aniversariantes-dia .aniversariantes-grid,
+.aniversariantes-dia .sem-aniversariantes {
+  margin-top: 20px;
+  margin-bottom: 0;
+}
